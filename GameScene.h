@@ -3,7 +3,7 @@
 
 #include "cocos2d.h"
 
-// Game类显示游戏主场景
+// Game绫绘樉绀烘父鎴忎富鍦烘櫙
 class Game : public cocos2d::Scene
 {
 public:
@@ -15,5 +15,6 @@ public:
 
     CREATE_FUNC(Game);
 };
+
 
 #endif // __GAME_SCENE_H__
