@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 
+// Game类显示游戏主场景
 class Game : public cocos2d::Scene
 {
 public:
@@ -10,10 +11,8 @@ public:
 
     virtual bool init();
 
-    // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
 
-    // implement the "static create()" method manually
     CREATE_FUNC(Game);
 };
 

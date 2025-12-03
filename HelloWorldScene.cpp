@@ -9,31 +9,26 @@ Scene* HelloWorld::createScene()
     return HelloWorld::create();
 }
 
-// Print useful error message instead of segfaulting when files are not there.
+// 对错误情况的处理方式
 static void problemLoading(const char* filename)
 {
     printf("Error while loading: %s\n", filename);
     printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 }
 
-// on "init" you need to initialize your instance
+// 对初始化函数init的实现
 bool HelloWorld::init()
 {
-    //////////////////////////////
-    // 1. super init first
+    // 套路，先调用父类的初始化函数
     if ( !Scene::init() )
     {
         return false;
     }
 
+    // 获取可视范围信息
     auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
+    // 创建一个“开始游戏”按钮
     auto startItem = MenuItemImage::create(
                                            "GameStartButton.png",
                                            "GameStartButton.png",
@@ -43,44 +38,31 @@ bool HelloWorld::init()
         startItem->getContentSize().width <= 0 ||
         startItem->getContentSize().height <= 0)
     {
-        problemLoading("'CloseNormal.png' and 'CloseSelected.png'");
+        problemLoading("'GameStartButton.png' and 'GameStartButton.png'");
     }
     else
     {
-        float x = origin.x + visibleSize.width / 2;
-        float y = origin.y + 200;
+        float x = visibleSize.width / 2;
+        float y = 200;
+        // 设置按钮的位置坐标（屏幕中间偏下位置）
         startItem->setPosition(Vec2(x,y));
+
+        // 设置按钮大小
         startItem->setScale(1.5);
 
     }
 
-    // create menu, it's an autorelease object
+    // 创建一个菜单变量（MenuItemImage类需要固定在菜单上）
+    // 将开始按钮添加到菜单
     auto menu = Menu::create(startItem, NULL);
+
+    // 菜单位置设置在原点
     menu->setPosition(Vec2::ZERO);
+
+    // 将菜单添加到场景
     this->addChild(menu, 1);
 
-    /////////////////////////////
-    // 3. add your codes below...
-
-    // add a label shows "Hello World"
-    // create and initialize a label
-
-    auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-    if (label == nullptr)
-    {
-        problemLoading("'fonts/Marker Felt.ttf'");
-    }
-    else
-    {
-        // position the label on the center of the screen
-        label->setPosition(Vec2(origin.x + visibleSize.width/2,
-                                origin.y + visibleSize.height - label->getContentSize().height));
-
-        // add the label as a child to this layer
-        this->addChild(label, 1);
-    }
-
-    // add "HelloWorld" splash screen"
+    // 创建一个精灵（游戏开屏图片）
     auto sprite = Sprite::create("StartScene.jpeg");
     if (sprite == nullptr)
     {
@@ -88,20 +70,24 @@ bool HelloWorld::init()
     }
     else
     {
-        // position the sprite on the center of the screen
-        sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+        // 将图片置于场景中央
+        sprite->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
+
+        // 设置图片大小，使其占满整个画面
         sprite->setScale(1.4);
 
-        // add the sprite as a child to this layer
+        // 将图片添加到场景
         this->addChild(sprite, 0);
     }
     return true;
 }
 
-
+// 点击按钮后，触发此函数，将当前场景更换为游戏场景
 void HelloWorld::menuCloseCallback(Ref* pSender)
 {
+    // 创建一个游戏场景
     auto gamescene = Game::createScene();
-    Director::getInstance()->replaceScene(gamescene);
 
+    // 更换场景
+    Director::getInstance()->replaceScene(gamescene);
 }
