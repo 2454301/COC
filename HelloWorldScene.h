@@ -5,8 +5,7 @@
 #include "cocos2d.h"
 
 // 一个HelloWorld类，作用是显示开屏画面
-class HelloWorld : public cocos2d::Scene
-{
+class HelloWorld : public cocos2d::Scene {
 public:
     // 场景创建函数
     static cocos2d::Scene* createScene();

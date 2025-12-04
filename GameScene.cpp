@@ -2,8 +2,7 @@
 
 USING_NS_CC;
 
-Scene* Game::createScene()
-{
+Scene* Game::createScene() {
     return Game::create();
 }
 
@@ -21,8 +20,13 @@ bool Game::init() {
 
     // 具体的实现有待商议，目前先放置图标，确认场景切换功能正常
     auto sprite = Sprite::create("HelloWorld.png");
-    sprite->setPosition(visibleSize.width / 2, visibleSize.height / 2);
-    this->addChild(sprite, 1);
+    if (sprite == nullptr) {
+        problemLoading("'HelloWorld.png'");
+    }
+    else {
+        sprite->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+        this->addChild(sprite, 1);
+    }
 
     return true;
 }
