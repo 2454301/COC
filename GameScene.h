@@ -2,8 +2,10 @@
 #define __GAME_SCENE_H__
 
 #include "cocos2d.h"
+#include "Soldier.h"
+#include "Building.h"
 
-// Game绫绘樉绀烘父鎴忎富鍦烘櫙
+// 显示游戏主场景
 class Game : public cocos2d::Scene {
 public:
     static cocos2d::Scene* createScene();
@@ -13,7 +15,39 @@ public:
     void menuCloseCallback(cocos2d::Ref* pSender);
 
     CREATE_FUNC(Game);
-};
 
+    // 枚举类，便于选择
+    enum SoldierType {
+        SOLDIER_NONE,
+        SOLDIER_BARBARIAN,
+        SOLDIER_ARCHER
+    };
+
+private:
+    // 触摸开始和结束检测函数
+    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
+    void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+
+    // 创建初始建筑
+    void createInitialBuildings();
+    // 创建兵种菜单
+    void createSoldierMenu();
+    // 注册触摸事件
+    void setupTouchEvents();
+    // 多兵种点击检测
+    void onBarbarianClicked(cocos2d::Ref* sender);
+    void onArcherClicked(cocos2d::Ref* sender);
+
+    // 建筑集合
+    std::vector<Building*> _buildings;
+    // 兵种集合
+    std::vector<Soldier*> _soldiers;
+    // 兵种选择按钮
+    cocos2d::MenuItemImage* _selectedSoldierButton = nullptr;
+    // 确定是否放置兵种
+    bool _isPlacingSoldier = false;
+    // 确定放置的是哪种兵种
+    SoldierType _selectedSoldierType = SOLDIER_NONE;
+};
 
 #endif // __GAME_SCENE_H__
