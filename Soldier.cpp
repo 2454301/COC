@@ -1,4 +1,5 @@
 #include "Soldier.h"
+#include "Building.h"
 
 Soldier* Soldier::createBarbarian() {
 	Soldier* soldier = new Soldier();
@@ -46,7 +47,7 @@ bool Soldier::initArcher() {
 	_health = _maxHealth = 100.0f;
 	_attack = 10.0f;
 	_speed = 250.0f;
-	_range = 300.0f;
+	_range = 200.0f;
 
 	_sprite = cocos2d::Sprite::create("Archer.png"); // 这里需要图片
 	this->addChild(_sprite);
@@ -67,7 +68,7 @@ GameObject* Soldier::findNearestBuilding() {
 	// 遍历所有建筑对象，找到离自己最近的作为攻击目标
 	// 可能有兵种有优先攻击目标，这一点还未实现
 	for (auto building : _availableBuildings) {
-		if (building && building->isAlive()) {
+		if (building && building->isAlive() && !building->isDestroyed()) {
 			float distance = myPos.distance(building->getPosition());
 			if (distance < minDistance) {
 				minDistance = distance;
@@ -77,14 +78,6 @@ GameObject* Soldier::findNearestBuilding() {
 	}
 
 	return nearest;
-}
-
-// 好像没用到这个函数
-void Soldier::moveTo(float x, float y) {
-	_targetPosition.set(x, y);
-	_isMoving = true;
-	_isAttacking = false;
-	_target = nullptr;
 }
 
 // 设置自己的攻击目标
@@ -165,7 +158,6 @@ void Soldier::updateBehavior(float dt) {
 
 }
 
-// 受攻击，因为还没做加农炮所以暂时不用
 void Soldier::onHit(float damage) {
 	_health -= damage;
 	if (!isAlive()) {
@@ -173,7 +165,20 @@ void Soldier::onHit(float damage) {
 	}
 }
 
-// 同上
+// 死了就移除掉
 void Soldier::onDestroy() {
-	this->removeFromParent();
+	GameObject::onDestroy();
+
+	auto removeAction = cocos2d::CallFunc::create([this]() {
+		if (this && this->getParent()) {
+			this->removeFromParent();
+		}
+	});
+
+	auto sequence = cocos2d::Sequence::create(
+		cocos2d::DelayTime::create(0.1f), // 延迟0.1秒
+		removeAction,
+		nullptr
+	);
+	this->runAction(sequence);
 }

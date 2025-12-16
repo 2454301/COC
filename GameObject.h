@@ -8,6 +8,7 @@ class GameObject : public cocos2d::Node {
 public:
 	CREATE_FUNC(GameObject);
 
+	// 初始化
 	virtual bool init() override {
 		if (!Node::init()) {
 			return false;
@@ -16,23 +17,40 @@ public:
 		return true;
 	}
 	
+	// 更新行为
 	virtual void updateBehavior(float dt) {}
+	// 受攻击
 	virtual void onHit(float damage) {}
-	virtual void onDestroy() {}
+	// 被摧毁
+	virtual void onDestroy() {
+		_isDestroyed = true;
+	}
 
+	// 设置血量
 	void setHealth(float health) {
 		_health = health;
 	}
+	// 获取血量
 	float getHealth() {
 		return _health;
 	}
+	// 判断存活
 	bool isAlive() {
-		return _health > 0;
+		return _health > 0 && !_isDestroyed;
+	}
+	// 判断摧毁
+	bool isDestroyed() {
+		return _isDestroyed;
 	}
 
 protected:
+	// 当前血量
 	float _health = 0.0f;
+	// 最大血量
 	float _maxHealth = 0.0f;
+	// 判断是否被摧毁
+	bool _isDestroyed = false;
+	// 图片显示
 	cocos2d::Sprite* _sprite = nullptr;
 
 private:

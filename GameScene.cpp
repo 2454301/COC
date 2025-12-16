@@ -11,17 +11,10 @@ Scene* Game::createScene() {
     return Game::create();
 }
 
-static void problemLoading(const char* filename) {
-    printf("Error while loading: %s\n", filename);
-    printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in GameScene.cpp\n");
-}
-
 bool Game::init() {
     if (!Scene::init()) {
         return false;
     }
-
-    auto visibleSize = Director::getInstance()->getVisibleSize();
 
     // 初始化建筑
     createInitialBuildings();
@@ -30,17 +23,70 @@ bool Game::init() {
     // 注册触摸事件
     setupTouchEvents();
 
+    // 启用逐帧更新
+    this->scheduleUpdate();
+
     return true;
 }
 
+void Game::update(float dt) {
+    // 对合法兵种更新行为
+    for (auto soldier : _soldiers) {
+        if (soldier && soldier->isAlive() && !soldier->isDestroyed()) {
+            soldier->updateBehavior(dt);
+        }
+    }
+    // 对合法建筑更新行为
+    for (auto building : _buildings) {
+        if (building && building->isAlive() && !building->isDestroyed()) {
+            building->setSoldiers(_soldiers);
+            building->updateBehavior(dt);
+        }
+    }
+    // 检测：把死亡的兵种从集合中移除
+    auto s_it = _soldiers.begin();
+    while (s_it != _soldiers.end()) {
+        auto soldier = *s_it;
+        if (!soldier || soldier->isDestroyed() || !soldier->isAlive()) {
+            if (soldier) {
+                soldier->removeFromParent();
+            }
+            s_it = _soldiers.erase(s_it);
+        }
+        else {
+            ++s_it;
+        }
+    }
+    // 检测：把摧毁的建筑从集合中移除
+    auto b_it = _buildings.begin();
+    while (b_it != _buildings.end()) {
+        auto building = *b_it;
+        if (!building || building->isDestroyed() || !building->isAlive()) {
+            if (building) {
+                building->removeFromParent();
+            }
+            b_it = _buildings.erase(b_it);
+        }
+        else {
+            ++b_it;
+        }
+    }
+}
+
+// 初始化建筑，现在放了一个大本营和一个加农炮
 void Game::createInitialBuildings() {
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
-    // 目前只放了一个大本营
+    // 大本营：放置在中央
     auto townHall = Building::createTownHall();
     townHall->setPosition(visibleSize.width / 2, visibleSize.height / 2);
     this->addChild(townHall);
     _buildings.push_back(townHall);
+    // 加农炮：放置在右上角
+    auto cannon = Building::createCannon();
+    cannon->setPosition(visibleSize.width / 2 + 150, visibleSize.height / 2 + 150);
+    this->addChild(cannon);
+    _buildings.push_back(cannon);
 }
 
 void Game::createSoldierMenu() {
@@ -77,12 +123,13 @@ bool Game::onTouchBegan(Touch* touch, Event* event) {
     return true; // 必须返回true，onTouchEnded才会被调用
 }
 
+// 放置兵种会调用此处函数
 void Game::onTouchEnded(Touch* touch, Event* event) {
     if (!_isPlacingSoldier || _selectedSoldierType == SOLDIER_NONE) {
         return;
     }
 
-    Vec2 touchLocation = touch->getLocation();
+    Vec2 touchLocation = touch->getLocation(); // 获取点击位置坐标
 
     Soldier* newSoldier = nullptr;
 
@@ -110,22 +157,32 @@ void Game::onTouchEnded(Touch* touch, Event* event) {
     }
 }
 
+// 以下代码重复较多，以后优化，现在先跑起来
+
 // 点击野蛮人按钮后调用
 void Game::onBarbarianClicked(Ref* sender) {
     auto button = dynamic_cast<MenuItemImage*>(sender);
     if (!button) return;
 
-    // 如果已经选在野蛮人按钮上，就取消选择
+    // 如果已经选在野蛮人按钮上，就取消选择，图标向下移动一点
     if (_selectedSoldierButton == button) {
+        _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+                                                          _selectedSoldierButton->getPositionY() - 50));
         _isPlacingSoldier = false;
         _selectedSoldierType = SOLDIER_NONE;
         _selectedSoldierButton = nullptr;
     }
-    // 否则更新到这个按钮
+    // 否则更新到这个按钮，图标向上移动一点
     else {
+        if (_selectedSoldierButton != nullptr) {
+            _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+                                                              _selectedSoldierButton->getPositionY() - 50));
+        }
         _isPlacingSoldier = true;
         _selectedSoldierType = SOLDIER_BARBARIAN;
         _selectedSoldierButton = button;
+        _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+                                                          _selectedSoldierButton->getPositionY() + 50));
     }
 }
 
@@ -135,13 +192,21 @@ void Game::onArcherClicked(Ref* sender) {
     if (!button) return;
 
     if (_selectedSoldierButton == button) {
+        _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+                                                          _selectedSoldierButton->getPositionY() - 50));
         _isPlacingSoldier = false;
         _selectedSoldierType = SOLDIER_NONE;
         _selectedSoldierButton = nullptr;
     }
     else {
+        if (_selectedSoldierButton != nullptr) {
+            _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+                                                              _selectedSoldierButton->getPositionY() - 50));
+        }
         _isPlacingSoldier = true;
         _selectedSoldierType = SOLDIER_ARCHER;
         _selectedSoldierButton = button;
+        _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+                                                          _selectedSoldierButton->getPositionY() + 50));
     }
 }

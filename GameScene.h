@@ -8,13 +8,12 @@
 // 显示游戏主场景
 class Game : public cocos2d::Scene {
 public:
+    // 场景创建
     static cocos2d::Scene* createScene();
-
-    virtual bool init();
-
-    void menuCloseCallback(cocos2d::Ref* pSender);
-
     CREATE_FUNC(Game);
+
+    // 初始化界面
+    virtual bool init();
 
     // 枚举类，便于选择
     enum SoldierType {
@@ -48,6 +47,9 @@ private:
     bool _isPlacingSoldier = false;
     // 确定放置的是哪种兵种
     SoldierType _selectedSoldierType = SOLDIER_NONE;
+
+    // 逐帧调用，更新行为
+    void update(float dt) override;
 };
 
 #endif // __GAME_SCENE_H__
