@@ -18,12 +18,12 @@ bool Building::initTownHall() {
 	}
 
 	_health = _maxHealth = 500.0f; // 500血量
+	_type = BUILDING_RESOURCE; // 大本营是资源类建筑
 
 	_sprite = cocos2d::Sprite::create("TownHall.png"); // 这里需要一个图片文件
 	// 添加进场景并调整一些参数
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
-	_sprite->setScale(2);
 	return true;
 }
 
@@ -43,6 +43,7 @@ bool Building::initCannon() {
 	}
 
 	_health = _maxHealth = 300.0f;
+	_type = BUILDING_DEFENSE; // 加农炮是防御类建筑
 
 	_attack = 40.0f;
 	_range = 250.0f;

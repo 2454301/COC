@@ -16,6 +16,10 @@ public:
 	// 停止
 	void stop();
 
+	BuildingType getType() {
+		return _type;
+	}
+
 	// 传入兵种集合
 	void setSoldiers(const std::vector<Soldier*>& soldiers) {
 		_availableSoldiers = soldiers;
@@ -47,6 +51,8 @@ private:
 	float _attack = 0.0f;
 	// 攻击范围
 	float _range = 0.0f;
+	// 建筑种类
+	BuildingType _type = BUILDING_NORMAL;
 	float _goldProduction; // 资源建筑可能用上
 	float _defense; // 防御力（？）不确定游戏里有没有这一项，先写着
 

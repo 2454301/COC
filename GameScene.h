@@ -19,7 +19,8 @@ public:
     enum SoldierType {
         SOLDIER_NONE,
         SOLDIER_BARBARIAN,
-        SOLDIER_ARCHER
+        SOLDIER_ARCHER,
+        SOLDIER_GIANT
     };
 
 private:
@@ -36,6 +37,7 @@ private:
     // 多兵种点击检测
     void onBarbarianClicked(cocos2d::Ref* sender);
     void onArcherClicked(cocos2d::Ref* sender);
+    void onGiantClicked(cocos2d::Ref* sender);
 
     // 建筑集合
     std::vector<Building*> _buildings;

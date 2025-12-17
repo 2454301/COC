@@ -8,6 +8,12 @@ class GameObject : public cocos2d::Node {
 public:
 	CREATE_FUNC(GameObject);
 
+	enum BuildingType {
+		BUILDING_NORMAL,
+		BUILDING_DEFENSE,
+		BUILDING_RESOURCE
+	};
+
 	// ≥ı ºªØ
 	virtual bool init() override {
 		if (!Node::init()) {

@@ -38,7 +38,7 @@ bool HelloWorld::init() {
         startItem->setPosition(Vec2(x,y));
 
         // 设置按钮大小
-        startItem->setScale(1.5);
+        startItem->setScale(0.5);
     }
 
     // 创建一个菜单变量（MenuItemImage类需要固定在菜单上）
@@ -61,7 +61,7 @@ bool HelloWorld::init() {
         sprite->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
 
         // 设置图片大小，使其占满整个画面
-        sprite->setScale(1.4);
+        sprite->setScale(0.5);
 
         // 将图片添加到场景
         this->addChild(sprite, 0);

@@ -11,6 +11,7 @@ public:
 	// 兵种创建
 	static Soldier* createBarbarian();
 	static Soldier* createArcher();
+	static Soldier* createGiant();
 
 	// 设置攻击目标
 	void attack(GameObject* target);
@@ -36,6 +37,7 @@ private:
 	// 兵种初始化
 	bool initBarbarian();
 	bool initArcher();
+	bool initGiant();
 
 	// 伤害
 	float _attack = 0.0f;
@@ -50,6 +52,8 @@ private:
 	bool _isAttacking = false;
 	// 攻击目标（这里用的类是GameObject，可能出现兵种互相攻击的情况，以后修复）
 	GameObject* _target = nullptr;
+	// 优先攻击的建筑种类
+	BuildingType _priority = BUILDING_NORMAL;
 	// 目标坐标
 	cocos2d::Vec2 _targetPosition = cocos2d::Vec2::ZERO;
 	// 攻击时间间隔

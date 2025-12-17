@@ -16,6 +16,12 @@ bool Game::init() {
         return false;
     }
 
+    auto map = TMXTiledMap::create("COCMap.tmx");
+    map->setAnchorPoint(Vec2::ZERO);
+    map->setPosition(Vec2::ZERO);
+    map->setScale(0.5);
+    this->addChild(map, -2);
+
     // 初始化建筑
     createInitialBuildings();
     // 创建兵种菜单
@@ -95,15 +101,20 @@ void Game::createSoldierMenu() {
     // 野蛮人兵种选择按钮
     auto barbarianBtn = MenuItemImage::create("Barbarian.png", "Barbarian.png", CC_CALLBACK_1(Game::onBarbarianClicked, this));
     barbarianBtn->setPosition(visibleSize.width * 0.2, 50);
-    barbarianBtn->setScale(2.5);
+    barbarianBtn->setScale(1.5);
 
     // 弓箭手兵种选择按钮
     auto archerBtn = MenuItemImage::create("Archer.png", "Archer.png", CC_CALLBACK_1(Game::onArcherClicked, this));
     archerBtn->setPosition(visibleSize.width * 0.4, 50);
-    archerBtn->setScale(2.5);
+    archerBtn->setScale(1.5);
+
+    // 巨人兵种选择按钮
+    auto giantBtn = MenuItemImage::create("Giant.png", "Giant.png", CC_CALLBACK_1(Game::onGiantClicked, this));
+    giantBtn->setPosition(visibleSize.width * 0.6, 50);
+    giantBtn->setScale(1.5);
 
     // 全部添加到菜单
-    auto menu = Menu::create(barbarianBtn, archerBtn, nullptr);
+    auto menu = Menu::create(barbarianBtn, archerBtn, giantBtn, nullptr);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 11);
 }
@@ -141,6 +152,10 @@ void Game::onTouchEnded(Touch* touch, Event* event) {
 
     case SOLDIER_ARCHER:
         newSoldier = Soldier::createArcher();
+        break;
+
+    case SOLDIER_GIANT:
+        newSoldier = Soldier::createGiant();
         break;
 
     default:
@@ -208,5 +223,29 @@ void Game::onArcherClicked(Ref* sender) {
         _selectedSoldierButton = button;
         _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
                                                           _selectedSoldierButton->getPositionY() + 50));
+    }
+}
+
+void Game::onGiantClicked(Ref* sender) {
+    auto button = dynamic_cast<MenuItemImage*>(sender);
+    if (!button) return;
+
+    if (_selectedSoldierButton == button) {
+        _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+            _selectedSoldierButton->getPositionY() - 50));
+        _isPlacingSoldier = false;
+        _selectedSoldierType = SOLDIER_NONE;
+        _selectedSoldierButton = nullptr;
+    }
+    else {
+        if (_selectedSoldierButton != nullptr) {
+            _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+                _selectedSoldierButton->getPositionY() - 50));
+        }
+        _isPlacingSoldier = true;
+        _selectedSoldierType = SOLDIER_GIANT;
+        _selectedSoldierButton = button;
+        _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+            _selectedSoldierButton->getPositionY() + 50));
     }
 }

@@ -20,7 +20,7 @@ bool Soldier::initBarbarian() {
 	_health = _maxHealth = 150.0f;
 	_attack = 10.0f;
 	_speed = 250.0f;
-	_range = 5.0f;
+	_range = 30.0f;
 
 	_sprite = cocos2d::Sprite::create("Barbarian.png"); // 这里需要图片
 	this->addChild(_sprite);
@@ -55,29 +55,65 @@ bool Soldier::initArcher() {
 	return true;
 }
 
+Soldier* Soldier::createGiant() {
+	Soldier* soldier = new Soldier();
+	if (soldier && soldier->initGiant()) {
+		soldier->autorelease();
+		return soldier;
+	}
+	delete soldier;
+	return nullptr;
+}
+
+bool Soldier::initGiant() {
+	if (!GameObject::init()) {
+		return false;
+	}
+
+	// 巨人相关数值
+	_health = _maxHealth = 250.0f;
+	_attack = 20.0f;
+	_speed = 150.0f;
+	_range = 40.0f;
+
+	_priority = BUILDING_DEFENSE;
+
+	_sprite = cocos2d::Sprite::create("Giant.png"); // 这里需要图片
+	this->addChild(_sprite);
+	_sprite->setPosition(cocos2d::Vec2::ZERO);
+	return true;
+}
+
 // 寻找攻击目标的逻辑
 GameObject* Soldier::findNearestBuilding() {
 	if (_availableBuildings.empty()) {
 		return nullptr;
 	}
 
-	GameObject* nearest = nullptr;
-	float minDistance = FLT_MAX;
+	GameObject* nearest_1 = nullptr, * nearest_2 = nullptr;
+	float minDistance_1 = FLT_MAX, minDistance_2 = FLT_MAX;
 	cocos2d::Vec2 myPos = this->getPosition();
 
-	// 遍历所有建筑对象，找到离自己最近的作为攻击目标
-	// 可能有兵种有优先攻击目标，这一点还未实现
+	// 遍历所有建筑对象，找到符合要求的为当前目标
 	for (auto building : _availableBuildings) {
 		if (building && building->isAlive() && !building->isDestroyed()) {
 			float distance = myPos.distance(building->getPosition());
-			if (distance < minDistance) {
-				minDistance = distance;
-				nearest = building;
+			if (building->getType() == _priority) {
+				if (distance < minDistance_1) {
+					minDistance_1 = distance;
+					nearest_1 = building;
+				}
+			}
+			else {
+				if (distance < minDistance_2) {
+					minDistance_2 = distance;
+					nearest_2 = building;
+				}
 			}
 		}
 	}
 
-	return nearest;
+	return nearest_1 != nullptr ? nearest_1 : nearest_2;
 }
 
 // 设置自己的攻击目标
