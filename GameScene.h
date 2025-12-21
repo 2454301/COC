@@ -5,7 +5,7 @@
 #include "Soldier.h"
 #include "Building.h"
 
-// 显示游戏主场景
+// 显示关卡主场景
 class Game : public cocos2d::Scene {
 public:
     // 场景创建
@@ -20,16 +20,17 @@ public:
         SOLDIER_NONE,
         SOLDIER_BARBARIAN,
         SOLDIER_ARCHER,
-        SOLDIER_GIANT
+        SOLDIER_GIANT,
+        SOLDIER_GOBLIN
     };
 
-private:
+protected:
     // 触摸开始和结束检测函数
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
     void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
 
     // 创建初始建筑
-    void createInitialBuildings();
+    virtual void createInitialBuildings();
     // 创建兵种菜单
     void createSoldierMenu();
     // 注册触摸事件
@@ -38,6 +39,7 @@ private:
     void onBarbarianClicked(cocos2d::Ref* sender);
     void onArcherClicked(cocos2d::Ref* sender);
     void onGiantClicked(cocos2d::Ref* sender);
+    void onGoblinClicked(cocos2d::Ref* sender);
 
     // 建筑集合
     std::vector<Building*> _buildings;
@@ -52,6 +54,14 @@ private:
 
     // 逐帧调用，更新行为
     void update(float dt) override;
+};
+
+class Level_1 : public Game {
+public:
+    static cocos2d::Scene* createScene();
+    CREATE_FUNC(Level_1);
+protected:
+    void createInitialBuildings() override;
 };
 
 #endif // __GAME_SCENE_H__

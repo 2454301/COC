@@ -11,6 +11,10 @@ Scene* Game::createScene() {
     return Game::create();
 }
 
+Scene* Level_1::createScene() {
+    return Level_1::create();
+}
+
 bool Game::init() {
     if (!Scene::init()) {
         return false;
@@ -54,9 +58,6 @@ void Game::update(float dt) {
     while (s_it != _soldiers.end()) {
         auto soldier = *s_it;
         if (!soldier || soldier->isDestroyed() || !soldier->isAlive()) {
-            if (soldier) {
-                soldier->removeFromParent();
-            }
             s_it = _soldiers.erase(s_it);
         }
         else {
@@ -77,20 +78,36 @@ void Game::update(float dt) {
             ++b_it;
         }
     }
+
+    if (_buildings.empty()) {
+        auto victory = Sprite::create("Victory.png");
+        victory->setPosition(Vec2(352, 352));
+        this->addChild(victory, 11);
+        auto delay = DelayTime::create(1.0f);
+        this->runAction(delay);
+        auto popScene = CallFunc::create([]() {
+            Director::getInstance()->popScene();
+            });
+        this->runAction(Sequence::create(delay, popScene, nullptr));
+    }
 }
 
-// 初始化建筑，现在放了一个大本营和一个加农炮
 void Game::createInitialBuildings() {
-    auto visibleSize = Director::getInstance()->getVisibleSize();
+    // 基类为空实现，由子类重写
+}
 
-    // 大本营：放置在中央
+// 初始化建筑
+void Level_1::createInitialBuildings() {
+
     auto townHall = Building::createTownHall();
-    townHall->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+    townHall->setPosition(Vec2(352, 352));
+    townHall->setScale(0.64);
     this->addChild(townHall);
     _buildings.push_back(townHall);
-    // 加农炮：放置在右上角
+
     auto cannon = Building::createCannon();
-    cannon->setPosition(visibleSize.width / 2 + 150, visibleSize.height / 2 + 150);
+    cannon->setPosition(Vec2(400, 400));
+    cannon->setScale(0.32);
     this->addChild(cannon);
     _buildings.push_back(cannon);
 }
@@ -113,8 +130,13 @@ void Game::createSoldierMenu() {
     giantBtn->setPosition(visibleSize.width * 0.6, 50);
     giantBtn->setScale(1.5);
 
+    // 哥布林兵种选择按钮
+    auto goblinBtn = MenuItemImage::create("Goblin.png", "Goblin.png", CC_CALLBACK_1(Game::onGoblinClicked, this));
+    goblinBtn->setPosition(visibleSize.width * 0.8, 50);
+    goblinBtn->setScale(1.5);
+
     // 全部添加到菜单
-    auto menu = Menu::create(barbarianBtn, archerBtn, giantBtn, nullptr);
+    auto menu = Menu::create(barbarianBtn, archerBtn, giantBtn, goblinBtn, nullptr);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 11);
 }
@@ -156,6 +178,10 @@ void Game::onTouchEnded(Touch* touch, Event* event) {
 
     case SOLDIER_GIANT:
         newSoldier = Soldier::createGiant();
+        break;
+
+    case SOLDIER_GOBLIN:
+        newSoldier = Soldier::createGoblin();
         break;
 
     default:
@@ -244,6 +270,30 @@ void Game::onGiantClicked(Ref* sender) {
         }
         _isPlacingSoldier = true;
         _selectedSoldierType = SOLDIER_GIANT;
+        _selectedSoldierButton = button;
+        _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+            _selectedSoldierButton->getPositionY() + 50));
+    }
+}
+
+void Game::onGoblinClicked(Ref* sender) {
+    auto button = dynamic_cast<MenuItemImage*>(sender);
+    if (!button) return;
+
+    if (_selectedSoldierButton == button) {
+        _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+            _selectedSoldierButton->getPositionY() - 50));
+        _isPlacingSoldier = false;
+        _selectedSoldierType = SOLDIER_NONE;
+        _selectedSoldierButton = nullptr;
+    }
+    else {
+        if (_selectedSoldierButton != nullptr) {
+            _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
+                _selectedSoldierButton->getPositionY() - 50));
+        }
+        _isPlacingSoldier = true;
+        _selectedSoldierType = SOLDIER_GOBLIN;
         _selectedSoldierButton = button;
         _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
             _selectedSoldierButton->getPositionY() + 50));

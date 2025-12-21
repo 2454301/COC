@@ -16,13 +16,38 @@ bool Soldier::initBarbarian() {
 		return false;
 	}
 
+	cocos2d::SpriteFrameCache::getInstance()->addSpriteFramesWithFile("COCBarbarianrun.plist");
+	cocos2d::SpriteFrameCache::getInstance()->addSpriteFramesWithFile("COCBarbarianattack.plist");
+	cocos2d::SpriteFrameCache::getInstance()->addSpriteFramesWithFile("COCBarbariandie.plist");
+
+	_runFrames.reserve(4);
+	for (int i = 1;i <= 4;i++) {
+		std::string frameName = cocos2d::StringUtils::format("barbarian run%d.png", i);
+		cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+		_runFrames.pushBack(frame);
+	}
+	_attackFrames.reserve(3);
+	for (int i = 1;i <= 3;i++) {
+		std::string frameName = cocos2d::StringUtils::format("barbarian attack%d.png", i);
+		cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);;
+		_attackFrames.pushBack(frame);
+	}
+	_dieFrames.reserve(3);
+	for (int i = 1;i <= 3;i++) {
+		std::string frameName = cocos2d::StringUtils::format("barbarian die%d.png", i);
+		cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);;
+		_dieFrames.pushBack(frame);
+	}
+
 	// 野蛮人相关数值（暂定）
 	_health = _maxHealth = 150.0f;
 	_attack = 10.0f;
-	_speed = 250.0f;
+	_speed = 50.0f;
 	_range = 30.0f;
 
-	_sprite = cocos2d::Sprite::create("Barbarian.png"); // 这里需要图片
+	_resourceCost = 50.0f;
+
+	_sprite = cocos2d::Sprite::createWithSpriteFrameName("barbarian run1.png"); // 这里需要图片
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
 	return true;
@@ -43,13 +68,37 @@ bool Soldier::initArcher() {
 		return false;
 	}
 
+	cocos2d::SpriteFrameCache::getInstance()->addSpriteFramesWithFile("COCArcher.plist");
+	cocos2d::SpriteFrameCache::getInstance()->addSpriteFramesWithFile("COCArcherattack.plist");
+
+	_runFrames.reserve(4);
+	for (int i = 1;i <= 4;i++) {
+		std::string frameName = cocos2d::StringUtils::format("archer1.png");
+		cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+		_runFrames.pushBack(frame);
+	}
+	_attackFrames.reserve(4);
+	for (int i = 1;i <= 4;i++) {
+		std::string frameName = cocos2d::StringUtils::format("archer%d.png", i);
+		cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+		_runFrames.pushBack(frame);
+	}
+	_dieFrames.reserve(3);
+	for (int i = 1;i <= 4;i++) {
+		std::string frameName = cocos2d::StringUtils::format("archer1.png");
+		cocos2d::SpriteFrame* frame = cocos2d::SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+		_runFrames.pushBack(frame);
+	}
+
 	// 弓箭手相关数值
 	_health = _maxHealth = 100.0f;
 	_attack = 10.0f;
-	_speed = 250.0f;
+	_speed = 50.0f;
 	_range = 200.0f;
 
-	_sprite = cocos2d::Sprite::create("Archer.png"); // 这里需要图片
+	_resourceCost = 50.0f;
+
+	_sprite = cocos2d::Sprite::createWithSpriteFrameName("archer1.png"); // 这里需要图片
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
 	return true;
@@ -76,9 +125,42 @@ bool Soldier::initGiant() {
 	_speed = 150.0f;
 	_range = 40.0f;
 
+	_resourceCost = 100.0f;
+
 	_priority = BUILDING_DEFENSE;
 
 	_sprite = cocos2d::Sprite::create("Giant.png"); // 这里需要图片
+	this->addChild(_sprite);
+	_sprite->setPosition(cocos2d::Vec2::ZERO);
+	return true;
+}
+
+Soldier* Soldier::createGoblin() {
+	Soldier* soldier = new Soldier();
+	if (soldier && soldier->initGoblin()) {
+		soldier->autorelease();
+		return soldier;
+	}
+	delete soldier;
+	return nullptr;
+}
+
+bool Soldier::initGoblin() {
+	if (!GameObject::init()) {
+		return false;
+	}
+
+	// 哥布林相关数值
+	_health = _maxHealth = 80.0f;
+	_attack = 10.0f;
+	_speed = 300.0f;
+	_range = 20.0f;
+
+	_resourceCost = 50.0f;
+
+	_priority = BUILDING_RESOURCE;
+
+	_sprite = cocos2d::Sprite::create("Goblin.png"); // 这里需要图片
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
 	return true;
@@ -163,15 +245,26 @@ void Soldier::updateBehavior(float dt) {
 
 			_attackTimer += dt;
 			if (_attackTimer >= 1.0f) { // 设置攻速1秒
+				_sprite->stopAllActions();
 				_target->onHit(_attack); // 攻击目标
-				auto jump = cocos2d::JumpBy::create(0.5, cocos2d::Vec2(0, 0), 100, 1);
-				this->runAction(jump); // 随便做的动画
+				auto animation = cocos2d::Animation::createWithSpriteFrames(_attackFrames, 0.1f);
+				auto animate = cocos2d::Animate::create(animation);
+				_sprite->runAction(animate);
 				_attackTimer = 0.0f;
 			}
 		}
 		// 如果在攻击范围外
 		else {
 			_isMoving = true;
+
+			_runTimer += dt;
+			if (_runTimer >= 0.6f) {
+				_sprite->stopAllActions();
+				auto animation = cocos2d::Animation::createWithSpriteFrames(_runFrames, 0.1f);
+				auto animate = cocos2d::Animate::create(animation);
+				_sprite->runAction(animate);
+				_runTimer = 0.0f;
+			}
 
 			cocos2d::Vec2 currentPos = this->getPosition();
 			cocos2d::Vec2 targetPos = _target->getPosition();
@@ -205,14 +298,20 @@ void Soldier::onHit(float damage) {
 void Soldier::onDestroy() {
 	GameObject::onDestroy();
 
+	_sprite->stopAllActions();
+
 	auto removeAction = cocos2d::CallFunc::create([this]() {
 		if (this && this->getParent()) {
 			this->removeFromParent();
 		}
 	});
 
+	auto animation = cocos2d::Animation::createWithSpriteFrames(_dieFrames, 0.1f);
+	auto animate = cocos2d::Animate::create(animation);
+	_sprite->runAction(animate);
+
 	auto sequence = cocos2d::Sequence::create(
-		cocos2d::DelayTime::create(0.1f), // 延迟0.1秒
+		cocos2d::DelayTime::create(0.4f),
 		removeAction,
 		nullptr
 	);

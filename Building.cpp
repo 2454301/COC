@@ -20,6 +20,8 @@ bool Building::initTownHall() {
 	_health = _maxHealth = 500.0f; // 500血量
 	_type = BUILDING_RESOURCE; // 大本营是资源类建筑
 
+	_size = 64;
+
 	_sprite = cocos2d::Sprite::create("TownHall.png"); // 这里需要一个图片文件
 	// 添加进场景并调整一些参数
 	this->addChild(_sprite);
@@ -47,6 +49,9 @@ bool Building::initCannon() {
 
 	_attack = 40.0f;
 	_range = 250.0f;
+	_size = 32;
+
+	_resourceCost = 100.0f;
 
 	_sprite = cocos2d::Sprite::create("Cannon.png");
 	this->addChild(_sprite);
@@ -54,9 +59,117 @@ bool Building::initCannon() {
 	return true;
 }
 
+Building* Building::createArmyCamp() {
+	Building* building = new Building();
+	if (building && building->initArmyCamp()) {
+		building->autorelease();
+		return building;
+	}
+	delete building;
+	return nullptr;
+}
+
+bool Building::initArmyCamp() {
+	if (!GameObject::init()) {
+		return false;
+	}
+
+	_health = _maxHealth = 300.0f;
+
+	_resourceCost = 150.0f;
+	_size = 32;
+
+	_sprite = cocos2d::Sprite::create("ArmyCamp.png");
+	this->addChild(_sprite);
+	_sprite->setPosition(cocos2d::Vec2::ZERO);
+	return true;
+}
+
+Building* Building::createBarracks() {
+	Building* building = new Building();
+	if (building && building->initBarracks()) {
+		building->autorelease();
+		return building;
+	}
+	delete building;
+	return nullptr;
+}
+
+bool Building::initBarracks() {
+	if (!GameObject::init()) {
+		return false;
+	}
+
+	_health = _maxHealth = 300.0f;
+
+	_resourceCost = 300.0f;
+	_size = 64;
+
+	_sprite = cocos2d::Sprite::create("Barracks.png");
+	this->addChild(_sprite);
+	_sprite->setPosition(cocos2d::Vec2::ZERO);
+	return true;
+}
+
+Building* Building::createGoldMine() {
+	Building* building = new Building();
+	if (building && building->initGoldMine()) {
+		building->autorelease();
+		return building;
+	}
+	delete building;
+	return nullptr;
+}
+
+bool Building::initGoldMine() {
+	if (!GameObject::init()) {
+		return false;
+	}
+
+	_health = _maxHealth = 300.0f;
+	_type = BUILDING_RESOURCE;
+
+	_resourceCost = 100.0f;
+	_resourceProduction = 100.0f;
+	_size = 32;
+
+	_sprite = cocos2d::Sprite::create("GoldMine.png");
+	this->addChild(_sprite);
+	_sprite->setPosition(cocos2d::Vec2::ZERO);
+	return true;
+}
+
+Building* Building::createElixirCollector() {
+	Building* building = new Building();
+	if (building && building->initElixirCollector()) {
+		building->autorelease();
+		return building;
+	}
+	delete building;
+	return nullptr;
+}
+
+bool Building::initElixirCollector() {
+	if (!GameObject::init()) {
+		return false;
+	}
+
+	_health = _maxHealth = 300.0f;
+	_type = BUILDING_RESOURCE;
+
+	_resourceCost = 100.0f;
+	_resourceProduction = 100.0f;
+	_size = 32;
+
+	_sprite = cocos2d::Sprite::create("ElixirCollector.png");
+	this->addChild(_sprite);
+	_sprite->setPosition(cocos2d::Vec2::ZERO);
+	return true;
+}
+
 // 寻找第一个进入攻击范围的兵种
 GameObject* Building::findFirstSoldier() {
-	if (_availableSoldiers.empty()) {
+	if (_availableSoldiers.empty() || _type != BUILDING_DEFENSE) {
 		return nullptr;
 	}
 
@@ -73,14 +186,6 @@ GameObject* Building::findFirstSoldier() {
 		}
 	}
 	return nullptr;
-}
-
-// 升级系统，暂时用不到
-void Building::upgrade() {
-	if (!_isUpgrading) {
-		_isUpgrading = true;
-		_upgradeTimer = 10.0f;
-	}
 }
 
 // 设置攻击目标

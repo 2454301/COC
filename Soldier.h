@@ -12,6 +12,7 @@ public:
 	static Soldier* createBarbarian();
 	static Soldier* createArcher();
 	static Soldier* createGiant();
+	static Soldier* createGoblin();
 
 	// 设置攻击目标
 	void attack(GameObject* target);
@@ -38,6 +39,7 @@ private:
 	bool initBarbarian();
 	bool initArcher();
 	bool initGiant();
+	bool initGoblin();
 
 	// 伤害
 	float _attack = 0.0f;
@@ -45,6 +47,8 @@ private:
 	float _speed = 0.0f;
 	// 攻击范围
 	float _range = 0.0f;
+	// 训练资源花费
+	float _resourceCost = 0.0f;
 
 	// 判断是否移动
 	bool _isMoving = false;
@@ -58,9 +62,15 @@ private:
 	cocos2d::Vec2 _targetPosition = cocos2d::Vec2::ZERO;
 	// 攻击时间间隔
 	float _attackTimer = 0.0f;
+	float _runTimer = 0.6f;
 
 	// 传入的合法建筑集合
 	std::vector<Building*> _availableBuildings;
+
+	cocos2d::Vector<cocos2d::SpriteFrame*> _runFrames;
+	cocos2d::Vector<cocos2d::SpriteFrame*> _attackFrames;
+	cocos2d::Vector<cocos2d::SpriteFrame*> _dieFrames;
+
 };
 
 #endif // __SOLDIER_H__

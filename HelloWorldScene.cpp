@@ -1,6 +1,7 @@
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
 #include "GameScene.h"
+#include "VillageScene.h"
 
 USING_NS_CC;
 
@@ -72,7 +73,7 @@ bool HelloWorld::init() {
 // 点击按钮后，触发此函数，将当前场景更换为游戏场景
 void HelloWorld::menuCloseCallback(Ref* pSender) {
     // 创建一个游戏场景
-    auto gamescene = Game::createScene();
+    auto gamescene = Village::createScene();
 
     // 更换场景
     Director::getInstance()->replaceScene(gamescene);
