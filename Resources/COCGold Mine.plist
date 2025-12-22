@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>Gold Mine.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,-0.5}</string>
+                <key>spriteSize</key>
+                <string>{64,65}</string>
+                <key>spriteSourceSize</key>
+                <string>{64,64}</string>
+                <key>textureRect</key>
+                <string>{{0,0},{64,65}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>3</integer>
+            <key>pixelFormat</key>
+            <string>RGBA8888</string>
+            <key>premultiplyAlpha</key>
+            <false/>
+            <key>realTextureFileName</key>
+            <string>COCGold Mine.png</string>
+            <key>size</key>
+            <string>{64,65}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:b11d3294853a71ccda1a2e0797b2b727:928bb18ab42c41dfa90424d8e0c3170d:63b8877494ed4b9e8e082c5c2273f15c$</string>
+            <key>textureFileName</key>
+            <string>COCGold Mine.png</string>
+        </dict>
+    </dict>
+</plist>
