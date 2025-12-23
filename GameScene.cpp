@@ -7,6 +7,7 @@ USING_NS_CC;
 // 这里是游戏主场景，现在还没有背景，会有兵种选择菜单和初始出来的建筑
 // 可选择兵种并放置，兵种会按照逻辑自动攻击
 
+// 创建场景（后续可添加更多关卡）
 Scene* Game::createScene() {
     return Game::create();
 }
@@ -15,11 +16,13 @@ Scene* Level_1::createScene() {
     return Level_1::create();
 }
 
+// 初始化
 bool Game::init() {
     if (!Scene::init()) {
         return false;
     }
 
+    // 添加地图
     auto map = TMXTiledMap::create("COCMap.tmx");
     map->setAnchorPoint(Vec2::ZERO);
     map->setPosition(Vec2::ZERO);
@@ -32,6 +35,22 @@ bool Game::init() {
     createSoldierMenu();
     // 注册触摸事件
     setupTouchEvents();
+
+    // 设置兵种数量标签
+    _barbarianLabel = Label::createWithTTF("Barbarian:0", "fonts/Marker Felt.ttf", 18);
+    _barbarianLabel->setPosition(Vec2(64, 688));
+    this->addChild(_barbarianLabel, 11);
+    _archerLabel = Label::createWithTTF("Arhcer:0", "fonts/Marker Felt.ttf", 18);
+    _archerLabel->setPosition(Vec2(64, 656));
+    this->addChild(_archerLabel, 11);
+    _giantLabel = Label::createWithTTF("Giant:0", "fonts/Marker Felt.ttf", 18);
+    _giantLabel->setPosition(Vec2(64, 624));
+    this->addChild(_giantLabel, 11);
+    _goblinLabel = Label::createWithTTF("Goblin:0", "fonts/Marker Felt.ttf", 18);
+    _goblinLabel->setPosition(Vec2(64, 592));
+    this->addChild(_goblinLabel, 11);
+
+    updateTroopLabels();
 
     // 启用逐帧更新
     this->scheduleUpdate();
@@ -79,16 +98,46 @@ void Game::update(float dt) {
         }
     }
 
-    if (_buildings.empty()) {
+    // 胜利判断逻辑
+    if (_buildings.empty()) { // 场上建筑均被摧毁
         auto victory = Sprite::create("Victory.png");
         victory->setPosition(Vec2(352, 352));
         this->addChild(victory, 11);
+
+        updateVillageTroopCounts();
+
         auto delay = DelayTime::create(1.0f);
         this->runAction(delay);
         auto popScene = CallFunc::create([]() {
             Director::getInstance()->popScene();
             });
-        this->runAction(Sequence::create(delay, popScene, nullptr));
+        this->runAction(Sequence::create(delay, popScene, nullptr)); // 播放胜利CG
+    }
+    
+    // 失败判断逻辑
+    bool hasAliveSoldiers = false;
+    for (auto soldier : _soldiers) {
+        if (soldier && soldier->isAlive() && !soldier->isDestroyed()) {
+            hasAliveSoldiers = true;
+            break;
+        }
+    }
+
+    bool hasAvailableTroops = (_availableBarbarians > 0 || _availableArchers > 0 ||
+        _availableGiants > 0 || _availableGoblins > 0);
+
+    if (!hasAliveSoldiers && !hasAvailableTroops) { // 场上兵种均阵亡，且可使用兵种已耗尽
+        auto defeat = Sprite::create("Defeat.png");
+        defeat->setPosition(Vec2(352, 352));
+        this->addChild(defeat, 11);
+
+        updateVillageTroopCounts();
+
+        auto delay = DelayTime::create(1.0f);
+        auto popScene = CallFunc::create([]() {
+            Director::getInstance()->popScene();
+            });
+        this->runAction(Sequence::create(delay, popScene, nullptr)); // 播放战败CG
     }
 }
 
@@ -96,22 +145,30 @@ void Game::createInitialBuildings() {
     // 基类为空实现，由子类重写
 }
 
+// 更新兵种数量标签
+void Game::updateTroopLabels() {
+    _barbarianLabel->setString(StringUtils::format("Barbarian:%d", _availableBarbarians));
+    _archerLabel->setString(StringUtils::format("Archer:%d", _availableArchers));
+    _giantLabel->setString(StringUtils::format("Giant:%d", _availableGiants));
+    _goblinLabel->setString(StringUtils::format("Goblin:%d", _availableGoblins));
+}
+
 // 初始化建筑
+// 第一关的建筑布局
 void Level_1::createInitialBuildings() {
 
     auto townHall = Building::createTownHall();
-    townHall->setPosition(Vec2(352, 352));
-    townHall->setScale(0.64);
+    townHall->setPosition(Vec2(368, 368));
     this->addChild(townHall);
     _buildings.push_back(townHall);
 
     auto cannon = Building::createCannon();
-    cannon->setPosition(Vec2(400, 400));
-    cannon->setScale(0.32);
+    cannon->setPosition(Vec2(448, 448));
     this->addChild(cannon);
     _buildings.push_back(cannon);
 }
 
+// 创建兵种选择菜单
 void Game::createSoldierMenu() {
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -141,6 +198,7 @@ void Game::createSoldierMenu() {
     this->addChild(menu, 11);
 }
 
+// 注册触摸事件
 void Game::setupTouchEvents() {
     auto listener = EventListenerTouchOneByOne::create();
 
@@ -152,6 +210,7 @@ void Game::setupTouchEvents() {
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
+// 点击开始
 bool Game::onTouchBegan(Touch* touch, Event* event) {
     return true; // 必须返回true，onTouchEnded才会被调用
 }
@@ -165,36 +224,59 @@ void Game::onTouchEnded(Touch* touch, Event* event) {
     Vec2 touchLocation = touch->getLocation(); // 获取点击位置坐标
 
     Soldier* newSoldier = nullptr;
+    bool canPlace = false;
 
     // 确定选择的是哪种兵种
     switch (_selectedSoldierType) {
     case SOLDIER_BARBARIAN:
-        newSoldier = Soldier::createBarbarian();
+        if (_availableBarbarians > 0) {
+            newSoldier = Soldier::createBarbarian();
+            canPlace = true;
+            _availableBarbarians--;
+            updateVillageTroopCounts();
+        }
         break;
 
     case SOLDIER_ARCHER:
-        newSoldier = Soldier::createArcher();
+        if (_availableArchers > 0) {
+            newSoldier = Soldier::createArcher();
+            canPlace = true;
+            _availableArchers--;
+            updateVillageTroopCounts();
+        }
         break;
 
     case SOLDIER_GIANT:
-        newSoldier = Soldier::createGiant();
+        if (_availableGiants > 0) {
+            newSoldier = Soldier::createGiant();
+            canPlace = true;
+            _availableGiants--;
+            updateVillageTroopCounts();
+        }
         break;
 
     case SOLDIER_GOBLIN:
-        newSoldier = Soldier::createGoblin();
+        if (_availableGoblins > 0) {
+            newSoldier = Soldier::createGoblin();
+            canPlace = true;
+            _availableGoblins--;
+            updateVillageTroopCounts();
+        }
         break;
 
     default:
         return;
     }
 
-    if (newSoldier) {
+    if (newSoldier && canPlace) {
         newSoldier->setPosition(touchLocation); // 在点击位置放置兵种
 
         newSoldier->setBuildings(_buildings); // 把场上的建筑集合传递给这个兵，让它选择攻击目标
 
         this->addChild(newSoldier);
         _soldiers.push_back(newSoldier);
+
+        updateTroopLabels(); // 更新
     }
 }
 

@@ -5,6 +5,7 @@
 
 USING_NS_CC;
 
+// 类声明
 class DraggableBuildings;
 
 // 创建场景
@@ -17,8 +18,6 @@ bool Village::init() {
 	if (!Scene::init()) {
 		return false;
 	}
-
-	auto visibleSize = Director::getInstance()->getVisibleSize();
 
 	// 加载地图
 	auto map = TMXTiledMap::create("COCMap.tmx");
@@ -36,43 +35,50 @@ bool Village::init() {
 	this->addChild(_elixirLabel);
 
 	// 放置建筑大本营
-	auto townHall = DraggableBuildings::create("TownHall.png");
+	auto townHall = DraggableBuildings::create("COCTown Hall.png");
 	townHall->setPosition(Vec2(352, 352));
-	townHall->setScale(0.64);
 	townHall->setAnchorPoint(Vec2(0, 0));
-	townHall->setSize(64);
+	townHall->setSize(96);
 	townHall->setVillage(this);
 	townHall->setBuildingType(DraggableBuildings::TOWN_HALL);
 	addBuilding(townHall);
 
 	// 放置建筑加农炮
-	auto cannon = DraggableBuildings::create("Cannon.png");
-	cannon->setPosition(Vec2(320, 320));
-	cannon->setScale(0.32);
+	auto cannon = DraggableBuildings::create("COCCannon.png");
+	cannon->setPosition(Vec2(352, 448));
 	cannon->setAnchorPoint(Vec2(0, 0));
-	cannon->setSize(32);
+	cannon->setSize(64);
 	cannon->setVillage(this);
 	cannon->setBuildingType(DraggableBuildings::CANNON);
 	addBuilding(cannon);
 
 	// 放置建筑金矿
-	auto goldMine = DraggableBuildings::create("GoldMIne.png");
-	goldMine->setPosition(Vec2(320, 352));
-	goldMine->setScale(0.32);
+	auto goldMine = DraggableBuildings::create("COCGold MIne.png");
+	goldMine->setPosition(Vec2(224, 352));
 	goldMine->setAnchorPoint(Vec2(0, 0));
-	goldMine->setSize(32);
+	goldMine->setSize(64);
 	goldMine->setVillage(this);
 	goldMine->setBuildingType(DraggableBuildings::GOLD_MINE);
 	addBuilding(goldMine);
 
-	auto elixirCollector = DraggableBuildings::create("ElixirCollector.png");
-	elixirCollector->setPosition(Vec2(416, 352));
-	elixirCollector->setScale(0.32);
+	// 放置建筑圣水收集器
+	auto elixirCollector = DraggableBuildings::create("COCElixir Collector.png");
+	elixirCollector->setPosition(Vec2(224, 416));
 	elixirCollector->setAnchorPoint(Vec2(0, 0));
-	elixirCollector->setSize(32);
+	elixirCollector->setSize(64);
 	elixirCollector->setVillage(this);
 	elixirCollector->setBuildingType(DraggableBuildings::ELIXIR_COLLECTOR);
 	addBuilding(elixirCollector);
+
+	// 放置建筑训练营
+	auto armyCamp = DraggableBuildings::create("ArmyCamp.png");
+	armyCamp->setPosition(Vec2(384, 288));
+	armyCamp->setScale(0.32);
+	armyCamp->setAnchorPoint(Vec2(0, 0));
+	armyCamp->setSize(32);
+	armyCamp->setVillage(this);
+	armyCamp->setBuildingType(DraggableBuildings::ARMY_CAMP);
+	addBuilding(armyCamp);
 
 	// 关卡系统：一个点击后可选择关卡的按钮、三个关卡进入按钮
 	levelItem = MenuItemImage::create("Level.png", "Level.png", CC_CALLBACK_1(Village::levelCallBack, this));
@@ -314,9 +320,9 @@ void DraggableBuildings::onTouchEnded(Touch* touch, Event* event)
 // 升级逻辑
 void DraggableBuildings::upgrade() {
 	if (_village) {
-		if (_level < 3 && _village->goldIsEnough(200)) { // 最高3级，且每次升级消耗200金币
+		if (_level < 3 && _village->goldIsEnough(200 * _level)) { // 最高3级，且每次升级消耗200*等级金币
+			_village->reduceGold(200 * _level);
 			_level++;
-			_village->reduceGold(200);
 		}
 	}
 }
@@ -331,26 +337,44 @@ void DraggableBuildings::onBuildingClicked() {
 	}
 }
 
+// 初始化建筑相关菜单
 void DraggableBuildings::initInfoPanel() {
 	_levelLabel = Label::createWithTTF("Lv.1", "fonts/Marker Felt.ttf", 18);
-	_levelLabel->setPosition(Vec2(0, 110));
+	_levelLabel->setPosition(Vec2(-60, 10));
 	_levelLabel->setVisible(false);
 	this->addChild(_levelLabel, 11);
 
 	_upgradeButton = MenuItemImage::create("UpgradeButton.png", "UpgradeButton.png", CC_CALLBACK_1(DraggableBuildings::onUpgradeClicked, this));
-	_upgradeButton->setPosition(Vec2(40, 110));
+	_upgradeButton->setPosition(Vec2(-20, 10));
 	_upgradeButton->setVisible(false);
 
 	_collectButton = MenuItemImage::create("CollectButton.png", "CollectButton.png", CC_CALLBACK_1(DraggableBuildings::onCollectClicked, this));
-	_collectButton->setPosition(Vec2(80, 110));
+	_collectButton->setPosition(Vec2(-20, 50));
 	_collectButton->setVisible(false);
 
-	_infoMenu = Menu::create(_upgradeButton, _collectButton, nullptr);
+	_trainBarbarianButton = MenuItemImage::create("BarbarianTrain.png", "BarbarianTrain.png", CC_CALLBACK_1(DraggableBuildings::onTrainBarbarianClicked, this));
+	_trainBarbarianButton->setPosition(Vec2(0, -10));
+	_trainBarbarianButton->setVisible(false);
+
+	_trainArcherButton = MenuItemImage::create("ArcherTrain.png", "ArcherTrain.png", CC_CALLBACK_1(DraggableBuildings::onTrainArcherClicked, this));
+	_trainArcherButton->setPosition(Vec2(40, -10));
+	_trainArcherButton->setVisible(false);
+
+	_trainGiantButton = MenuItemImage::create("GiantTrain.png", "GiantTrain.png", CC_CALLBACK_1(DraggableBuildings::onTrainGiantClicked, this));
+	_trainGiantButton->setPosition(Vec2(80, -10));
+	_trainGiantButton->setVisible(false);
+
+	_trainGoblinButton = MenuItemImage::create("GoblinTrain.png", "GoblinTrain.png", CC_CALLBACK_1(DraggableBuildings::onTrainGoblinClicked, this));
+	_trainGoblinButton->setPosition(Vec2(120, -10));
+	_trainGoblinButton->setVisible(false);
+
+	_infoMenu = Menu::create(_upgradeButton, _collectButton, _trainBarbarianButton, _trainArcherButton, _trainGiantButton, _trainGoblinButton, nullptr);
 	_infoMenu->setPosition(Vec2::ZERO);
 	_infoMenu->setVisible(false);
 	this->addChild(_infoMenu, 11);
 }
 
+// 显示建筑相关菜单
 void DraggableBuildings::showInfoPanel() {
 	if (!_village) {
 		return;
@@ -363,20 +387,31 @@ void DraggableBuildings::showInfoPanel() {
 	_infoMenu->setVisible(true);
 	_upgradeButton->setVisible(true);
 	_infoPanelVisible = true;
+	// 生产类建筑设置收集按钮为可见
 	if (_buildingType == GOLD_MINE || _buildingType == ELIXIR_COLLECTOR) {
 		_collectButton->setVisible(true);
 	}
 	else {
 		_collectButton->setVisible(false);
 	}
+
+	// 训练营设置训练按钮可见
+	if (_buildingType == ARMY_CAMP) {
+		_trainBarbarianButton->setVisible(true);
+		_trainArcherButton->setVisible(true);
+		_trainGiantButton->setVisible(true);
+		_trainGoblinButton->setVisible(true);
+	}
 }
 
+// 隐藏建筑相关菜单
 void DraggableBuildings::hideInfoPanel() {
 	_levelLabel->setVisible(false);
 	_infoMenu->setVisible(false);
 	_infoPanelVisible = false;
 }
 
+// 隐藏其他建筑相关菜单
 void DraggableBuildings::hideOtherBuildingPanels() {
 	if (!_village) {
 		return;
@@ -389,43 +424,87 @@ void DraggableBuildings::hideOtherBuildingPanels() {
 	}
 }
 
+// 更新建筑相关菜单
 void DraggableBuildings::updateInfoPanel() {
 	// 更新等级显示
 	std::string levelText = "Lv." + std::to_string(_level);
 	_levelLabel->setString(levelText);
 }
 
+// 升级按钮回调函数
 void DraggableBuildings::onUpgradeClicked(cocos2d::Ref* sender) {
 	upgrade();
 	updateInfoPanel();
 }
 
+// 收集按钮回调函数
 void DraggableBuildings::onCollectClicked(cocos2d::Ref* sender) {
 	if (!_village) {
 		return;
 	}
 
 	if (_buildingType == GOLD_MINE) {
-		// 收集100金币
-		_village->addGold(100);
+		// 收集金币
+		_village->addGold(100 * this->_level);
 	}
 	else if (_buildingType == ELIXIR_COLLECTOR) {
-		// 收集100圣水
-		_village->addElixir(100);
+		// 收集圣水
+		_village->addElixir(100 * this->_level);
+	}
+}
+
+// 训练野蛮人
+void DraggableBuildings::onTrainBarbarianClicked(cocos2d::Ref* sender) {
+	if (_village) {
+		if (_village->elixirIsEnough(50)) {
+			_village->reduceElixir(50);
+			_village->_numOfBarbarians++;
+		}
+	}
+}
+
+// 训练弓箭手
+void DraggableBuildings::onTrainArcherClicked(cocos2d::Ref* sender) {
+	if (_village) {
+		if (_village->elixirIsEnough(50)) {
+			_village->reduceElixir(50);
+			_village->_numOfArchers++;
+		}
+	}
+}
+
+// 训练巨人
+void DraggableBuildings::onTrainGiantClicked(cocos2d::Ref* sender) {
+	if (_village) {
+		if (_village->elixirIsEnough(100)) {
+			_village->reduceElixir(100);
+			_village->_numOfGiants++;
+		}
+	}
+}
+
+// 训练哥布林
+void DraggableBuildings::onTrainGoblinClicked(cocos2d::Ref* sender) {
+	if (_village) {
+		if (_village->elixirIsEnough(50)) {
+			_village->reduceElixir(50);
+			_village->_numOfGoblins++;
+		}
 	}
 }
 
 // 以下都是关卡系统相关回调函数
 
 void Village::levelCallBack(Ref* psender) {
-	static bool valid = true;
-	if (valid) {
+	static bool valid = true; // 记录点击次数
+	if (valid) { // 说明关卡选择按钮还未出现
+		// 把关卡选择按钮放出来
 		levelItem_1->setPosition(Vec2(608, 672));
 		levelItem_2->setPosition(Vec2(544, 672));
 		levelItem_3->setPosition(Vec2(480, 672));
 		valid = !valid;
 	}
-	else {
+	else { // 相反
 		levelItem_1->setPosition(Vec2(608, 736));
 		levelItem_2->setPosition(Vec2(544, 736));
 		levelItem_3->setPosition(Vec2(480, 736));
@@ -434,12 +513,26 @@ void Village::levelCallBack(Ref* psender) {
 }
 
 void Village::levelCallBack_1(Ref* psender) {
+	// 未训练兵种，禁止进入关卡
+	if (_numOfBarbarians == 0 && _numOfArchers == 0 && _numOfGiants == 0 && _numOfGoblins == 0) {
+		return;
+	}
+
+	// 创建关卡场景
 	auto levelscene = Level_1::createScene();
-	Director::getInstance()->pushScene(levelscene);
+
+	// 关联关卡场景和主村庄场景
+	auto level = dynamic_cast<Level_1*>(levelscene);
+	if (level) {
+		level->setTroopCounts(_numOfBarbarians, _numOfArchers, _numOfGiants, _numOfGoblins); // 传入训练的兵种
+		level->setVillage(this); // 让关卡场景可以访问主村庄场景
+	}
+
+	Director::getInstance()->pushScene(levelscene); // 关卡场景进栈
 }
 
 void Village::levelCallBack_2(Ref* psender) {
-
+	// 2、3关未完成
 }
 
 void Village::levelCallBack_3(Ref* psender) {

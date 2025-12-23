@@ -54,8 +54,6 @@ private:
 	float _attack = 0.0f;
 	// 攻击范围
 	float _range = 0.0f;
-	// 建筑占地
-	int _size = 0;
 	// 建筑种类
 	BuildingType _type = BUILDING_NORMAL;
 	// 资源类建筑生产效率

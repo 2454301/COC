@@ -20,9 +20,7 @@ bool Building::initTownHall() {
 	_health = _maxHealth = 500.0f; // 500血量
 	_type = BUILDING_RESOURCE; // 大本营是资源类建筑
 
-	_size = 64;
-
-	_sprite = cocos2d::Sprite::create("TownHall.png"); // 这里需要一个图片文件
+	_sprite = cocos2d::Sprite::create("COCTown Hall.png"); // 这里需要一个图片文件
 	// 添加进场景并调整一些参数
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
@@ -49,11 +47,10 @@ bool Building::initCannon() {
 
 	_attack = 40.0f;
 	_range = 250.0f;
-	_size = 32;
 
 	_resourceCost = 100.0f;
 
-	_sprite = cocos2d::Sprite::create("Cannon.png");
+	_sprite = cocos2d::Sprite::create("COCCannon.png");
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
 	return true;
@@ -77,7 +74,6 @@ bool Building::initArmyCamp() {
 	_health = _maxHealth = 300.0f;
 
 	_resourceCost = 150.0f;
-	_size = 32;
 
 	_sprite = cocos2d::Sprite::create("ArmyCamp.png");
 	this->addChild(_sprite);
@@ -103,9 +99,8 @@ bool Building::initBarracks() {
 	_health = _maxHealth = 300.0f;
 
 	_resourceCost = 300.0f;
-	_size = 64;
 
-	_sprite = cocos2d::Sprite::create("Barracks.png");
+	_sprite = cocos2d::Sprite::create("COCBarracks.png");
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
 	return true;
@@ -131,9 +126,8 @@ bool Building::initGoldMine() {
 
 	_resourceCost = 100.0f;
 	_resourceProduction = 100.0f;
-	_size = 32;
 
-	_sprite = cocos2d::Sprite::create("GoldMine.png");
+	_sprite = cocos2d::Sprite::create("COCGold Mine.png");
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
 	return true;
@@ -159,9 +153,8 @@ bool Building::initElixirCollector() {
 
 	_resourceCost = 100.0f;
 	_resourceProduction = 100.0f;
-	_size = 32;
 
-	_sprite = cocos2d::Sprite::create("ElixirCollector.png");
+	_sprite = cocos2d::Sprite::create("COCElixir Collector.png");
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
 	return true;

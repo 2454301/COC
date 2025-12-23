@@ -3,9 +3,11 @@
 
 #include "cocos2d.h"
 
+// 类声明
 class Soldier;
 class DraggableBuildings;
 
+// 主存庄类
 class Village : public cocos2d::Scene {
 public:
 	static cocos2d::Scene* createScene();
@@ -13,6 +15,7 @@ public:
 
 	virtual bool init();
 
+	// 资源处理相关函数
 	void addGold(float gold);
 	void addElixir(float elixir);
 	void reduceGold(float gold);
@@ -20,21 +23,32 @@ public:
 	bool goldIsEnough(float gold);
 	bool elixirIsEnough(float elixir);
 
+	// 建筑处理相关函数
 	void addBuilding(DraggableBuildings* building);
 	bool isTouching(DraggableBuildings* pointBuilding);
 
+	// 更新资源标签
 	void updateResourceLabels();
 
-	std::vector<Soldier*> _mySoldiers;
+	// 训练的兵种数量
+	int _numOfBarbarians = 0;
+	int _numOfArchers = 0;
+	int _numOfGiants = 0;
+	int _numOfGoblins = 0;
+
+	// 场上的建筑集合
 	std::vector<DraggableBuildings*> _myBuildings;
 
 private:
+	// 初始金币、圣水
 	float _gold = 1000.0f;
 	float _elixir = 1000.0f;
 
+	// 金币、圣水数量标签
 	cocos2d::Label* _goldLabel = nullptr;
 	cocos2d::Label* _elixirLabel = nullptr;
 
+	// 关卡系统相关菜单按钮及回调函数
 	cocos2d::MenuItemImage* levelItem;
 	cocos2d::MenuItemImage* levelItem_1;
 	cocos2d::MenuItemImage* levelItem_2;
@@ -45,8 +59,10 @@ private:
 	void levelCallBack_3(cocos2d::Ref* psender);
 };
 
+// 可拖动建筑类（主村庄和关卡中的建筑需要实现的功能不一样，故新写一个类）
 class DraggableBuildings : public cocos2d::Sprite {
 public:
+	// 枚举建筑种类
 	enum BuildingType {
 		NONE,
 		TOWN_HALL,
@@ -60,6 +76,7 @@ public:
 	static DraggableBuildings* create(const std::string& filename);
 	virtual bool init(const std::string& filename);
 
+	// 初始化相关设置函数
 	void setDraggable(bool draggable);
 	void setVillage(Village* village);
 	bool isDragging() {
@@ -68,8 +85,11 @@ public:
 	void setSize(int size) {
 		_size = size;
 	}
+
+	// 升级函数
 	void upgrade();
 
+	// 设置和获取建筑种类
 	void setBuildingType(BuildingType type) {
 		_buildingType = type;
 	}
@@ -77,28 +97,45 @@ public:
 		return _buildingType;
 	}
 
+	// 点击回调函数
 	void onBuildingClicked();
 
+	// 菜单栏相关函数
 	void initInfoPanel();
 	void showInfoPanel();
 	void hideInfoPanel();
 	void hideOtherBuildingPanels();
 
 private:
+	// 判断拖动相关
 	bool _isDragging = false;
 	bool _hasMoved = false;
+
+	// 坐标设置相关
 	cocos2d::Vec2 _dragOffset;
 	cocos2d::Vec2 _originalPos;
 	cocos2d::Vec2 _touchBeganPos;
 	int _size = 0;
+	
+	// 等级（初始1级）
 	int _level = 1;
 
+	// 建筑种类
 	BuildingType _buildingType = NONE;
-	Village* _village;
 
+	// 和主村庄关联
+	Village* _village = nullptr;
+
+	// 各种菜单项
 	cocos2d::Label* _levelLabel = nullptr;
 	cocos2d::MenuItemImage* _upgradeButton = nullptr;
 	cocos2d::MenuItemImage* _collectButton = nullptr;
+
+	cocos2d::MenuItemImage* _trainBarbarianButton = nullptr;
+	cocos2d::MenuItemImage* _trainArcherButton = nullptr;
+	cocos2d::MenuItemImage* _trainGiantButton = nullptr;
+	cocos2d::MenuItemImage* _trainGoblinButton = nullptr;
+
 	cocos2d::Menu* _infoMenu = nullptr;
 	bool _infoPanelVisible = false;
 
@@ -107,8 +144,17 @@ private:
 	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
 
+	// 升级、收集回调
 	void onUpgradeClicked(cocos2d::Ref* sender);
 	void onCollectClicked(cocos2d::Ref* sender);
+
+	// 训练回调
+	void onTrainBarbarianClicked(cocos2d::Ref* sender);
+	void onTrainArcherClicked(cocos2d::Ref* sender);
+	void onTrainGiantClicked(cocos2d::Ref* sender);
+	void onTrainGoblinClicked(cocos2d::Ref* sender);
+
+	// 更新菜单
 	void updateInfoPanel();
 };
 

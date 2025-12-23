@@ -67,6 +67,7 @@ private:
 	// 传入的合法建筑集合
 	std::vector<Building*> _availableBuildings;
 
+	// 移动、攻击、死亡帧集合
 	cocos2d::Vector<cocos2d::SpriteFrame*> _runFrames;
 	cocos2d::Vector<cocos2d::SpriteFrame*> _attackFrames;
 	cocos2d::Vector<cocos2d::SpriteFrame*> _dieFrames;
