@@ -19,24 +19,37 @@ bool Village::init() {
 		return false;
 	}
 
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+	float x = visibleSize.width;
+	float y = visibleSize.height;
+
 	// 加载地图
-	auto map = TMXTiledMap::create("COCMap.tmx");
+	auto map = TMXTiledMap::create("COCmap1.tmx");
 	map->setAnchorPoint(Vec2::ZERO);
 	map->setPosition(Vec2::ZERO);
-	map->setScale(0.5);
 	this->addChild(map, -2);
+
+	// 创建高亮绘制的DrawNode
+	_buildingOutlineDrawNode = DrawNode::create();
+	this->addChild(_buildingOutlineDrawNode, 10); // 较高的z-order，确保在建筑上方
+	_gridAreaDrawNode = DrawNode::create();
+	this->addChild(_gridAreaDrawNode, 9); // 稍低的z-order，在建筑边框下方
+
+	// 初始时隐藏高亮
+	_buildingOutlineDrawNode->setVisible(false);
+	_gridAreaDrawNode->setVisible(false);
 
 	// 放置金币和圣水数量的标签
 	_goldLabel = Label::createWithTTF("Gold: 1000", "fonts/Marker Felt.ttf", 24);
-	_goldLabel->setPosition(Vec2(352, 688));
+	_goldLabel->setPosition(Vec2(x / 2, y - 16));
 	this->addChild(_goldLabel, 11);
 	_elixirLabel = Label::createWithTTF("Elixir: 1000", "fonts/Marker Felt.ttf", 24);
-	_elixirLabel->setPosition(Vec2(352, 656));
+	_elixirLabel->setPosition(Vec2(x / 2, y - 48));
 	this->addChild(_elixirLabel);
 
 	// 放置建筑大本营
 	auto townHall = DraggableBuildings::create("COCTown Hall.png");
-	townHall->setPosition(Vec2(352, 352));
+	townHall->setPosition(Vec2(1024, 576));
 	townHall->setAnchorPoint(Vec2(0, 0));
 	townHall->setSize(96);
 	townHall->setVillage(this);
@@ -45,7 +58,7 @@ bool Village::init() {
 
 	// 放置建筑加农炮
 	auto cannon = DraggableBuildings::create("COCCannon.png");
-	cannon->setPosition(Vec2(352, 448));
+	cannon->setPosition(Vec2(1024, 672));
 	cannon->setAnchorPoint(Vec2(0, 0));
 	cannon->setSize(64);
 	cannon->setVillage(this);
@@ -54,7 +67,7 @@ bool Village::init() {
 
 	// 放置建筑金矿
 	auto goldMine = DraggableBuildings::create("COCGold MIne.png");
-	goldMine->setPosition(Vec2(224, 352));
+	goldMine->setPosition(Vec2(928, 640));
 	goldMine->setAnchorPoint(Vec2(0, 0));
 	goldMine->setSize(64);
 	goldMine->setVillage(this);
@@ -63,7 +76,7 @@ bool Village::init() {
 
 	// 放置建筑圣水收集器
 	auto elixirCollector = DraggableBuildings::create("COCElixir Collector.png");
-	elixirCollector->setPosition(Vec2(224, 416));
+	elixirCollector->setPosition(Vec2(928, 576));
 	elixirCollector->setAnchorPoint(Vec2(0, 0));
 	elixirCollector->setSize(64);
 	elixirCollector->setVillage(this);
@@ -72,7 +85,7 @@ bool Village::init() {
 
 	// 放置建筑训练营
 	auto armyCamp = DraggableBuildings::create("ArmyCamp.png");
-	armyCamp->setPosition(Vec2(384, 288));
+	armyCamp->setPosition(Vec2(1024, 480));
 	armyCamp->setScale(0.32);
 	armyCamp->setAnchorPoint(Vec2(0, 0));
 	armyCamp->setSize(32);
@@ -85,15 +98,81 @@ bool Village::init() {
 	levelItem_1= MenuItemImage::create("Level_1.png", "Level_1.png", CC_CALLBACK_1(Village::levelCallBack_1, this));
 	levelItem_2 = MenuItemImage::create("Level_2.png", "Level_2.png", CC_CALLBACK_1(Village::levelCallBack_2, this));
 	levelItem_3 = MenuItemImage::create("Level_3.png", "Level_3.png", CC_CALLBACK_1(Village::levelCallBack_3, this));
-	levelItem->setPosition(Vec2(672, 672));
-	levelItem_1->setPosition(Vec2(608, 736));
-	levelItem_2->setPosition(Vec2(544, 736));
-	levelItem_3->setPosition(Vec2(480, 736));
+	levelItem->setPosition(Vec2(x - 32, y - 32));
+	levelItem_1->setPosition(Vec2(x - 96, y + 64));
+	levelItem_2->setPosition(Vec2(x - 160, y + 64));
+	levelItem_3->setPosition(Vec2(x - 224, y + 64));
 	auto menu = Menu::create(levelItem, levelItem_1, levelItem_2, levelItem_3, nullptr);
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 11);
 
 	return true;
+}
+
+// 显示所有建筑边框高亮
+void Village::showBuildingOutlines() {
+	_buildingOutlineDrawNode->clear();
+	_buildingOutlineDrawNode->setVisible(true);
+
+	// 设置边框颜色为绿色
+	Color4F outlineColor(0.0f, 1.0f, 0.0f, 0.8f);
+	float lineWidth = 2.0f;
+
+	// 遍历所有建筑，绘制边框
+	for (auto building : _myBuildings) {
+		if (building) {
+			// 获取建筑在世界坐标系中的边界框
+			Rect rect = building->getBoundingBox();
+
+			// 将世界坐标转换为DrawNode的本地坐标
+			// 因为 DrawNode 是直接添加到场景中的，所以需要将世界坐标转换为场景坐标
+			Vec2 bottomLeft = this->convertToNodeSpace(rect.origin);
+			Vec2 bottomRight = this->convertToNodeSpace(Vec2(rect.getMaxX(), rect.getMinY()));
+			Vec2 topRight = this->convertToNodeSpace(Vec2(rect.getMaxX(), rect.getMaxY()));
+			Vec2 topLeft = this->convertToNodeSpace(Vec2(rect.getMinX(), rect.getMaxY()));
+
+			// 绘制矩形边框
+			_buildingOutlineDrawNode->drawLine(bottomLeft, bottomRight, outlineColor);
+			_buildingOutlineDrawNode->drawLine(bottomRight, topRight, outlineColor);
+			_buildingOutlineDrawNode->drawLine(topRight, topLeft, outlineColor);
+			_buildingOutlineDrawNode->drawLine(topLeft, bottomLeft, outlineColor);
+		}
+	}
+}
+
+// 隐藏建筑边框高亮
+void Village::hideBuildingOutlines() {
+	_buildingOutlineDrawNode->setVisible(false);
+}
+
+// 显示网格区域高亮
+void Village::showGridArea() {
+	_gridAreaDrawNode->clear();
+	_gridAreaDrawNode->setVisible(true);
+
+	// 设置网格区域颜色为蓝色
+	Color4F gridColor(0.0f, 0.0f, 1.0f, 0.6f);
+
+	// 定义矩形范围的四个顶点
+	Vec2 vertices[4] = {
+		Vec2(640, 192),
+		Vec2(640, 800),
+		Vec2(1408, 800),
+		Vec2(1408, 192)
+	};
+
+	// 绘制矩形边框
+	for (int i = 0; i < 4; i++) {
+		_gridAreaDrawNode->drawLine(vertices[i], vertices[(i + 1) % 4], gridColor);
+	}
+
+	// 填充矩形内部（半透明）
+	_gridAreaDrawNode->drawSolidRect(vertices[0], vertices[2], Color4F(0.0f, 0.0f, 1.0f, 0.2f));
+}
+
+// 隐藏网格区域高亮
+void Village::hideGridArea() {
+	_gridAreaDrawNode->setVisible(false);
 }
 
 // 更新资源数量标签
@@ -254,6 +333,11 @@ bool DraggableBuildings::onTouchBegan(Touch* touch, Event* event)
 
 		_touchBeganPos = touch->getLocation();
 
+		if (_village) {
+			_village->showBuildingOutlines(); // 显示建筑边框高亮
+			_village->showGridArea(); // 显示网格区域高亮
+		}
+
 		return true;
 	}
 
@@ -269,6 +353,11 @@ void DraggableBuildings::onTouchMoved(Touch* touch, Event* event)
 		this->setPosition(newPosition);
 
 		_hasMoved = true;
+
+		if (_village) {
+			_village->showBuildingOutlines();  // 更新建筑边框
+			_village->showGridArea(); // 更新网格区域
+		}
 	}
 }
 
@@ -283,6 +372,12 @@ void DraggableBuildings::onTouchEnded(Touch* touch, Event* event)
 		float moveDistance = _touchBeganPos.distance(touchEndedPos);
 		if (moveDistance <= 10.0f && !_hasMoved) { // 如果移动很小（视作点击而非拖动）
 			onBuildingClicked(); // 则触发点击对应的回调函数
+
+			if (_village) {
+				_village->hideBuildingOutlines();
+				_village->hideGridArea();
+			}
+
 			return;
 		}
 		_hasMoved = false;
@@ -296,8 +391,8 @@ void DraggableBuildings::onTouchEnded(Touch* touch, Event* event)
 
 	Vec2 nowPos = this->getPosition();
 
-	for (int x = 0;x <= 704 - this->_size;x += 32) {
-		for (int y = 0;y <= 640 - this->_size;y += 32) {
+	for (int x = 640;x <= 1408 - this->_size;x += 32) {
+		for (int y = 192;y <= 800 - this->_size;y += 32) {
 			float dis = sqrt((x - nowPos.x) * (x - nowPos.x) + (y - nowPos.y) * (y - nowPos.y));
 			if (dis < distance) {
 				distance = dis;
@@ -314,6 +409,11 @@ void DraggableBuildings::onTouchEnded(Touch* touch, Event* event)
 	}
 	if (isOverlapping) {
 		this->setPosition(_originalPos); // 就把该建筑放回原位置，表示移动失败
+	}
+
+	if (_village) {
+		_village->hideBuildingOutlines();
+		_village->hideGridArea();
 	}
 }
 
@@ -496,18 +596,22 @@ void DraggableBuildings::onTrainGoblinClicked(cocos2d::Ref* sender) {
 // 以下都是关卡系统相关回调函数
 
 void Village::levelCallBack(Ref* psender) {
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+	float x = visibleSize.width;
+	float y = visibleSize.height;
+
 	static bool valid = true; // 记录点击次数
 	if (valid) { // 说明关卡选择按钮还未出现
 		// 把关卡选择按钮放出来
-		levelItem_1->setPosition(Vec2(608, 672));
-		levelItem_2->setPosition(Vec2(544, 672));
-		levelItem_3->setPosition(Vec2(480, 672));
+		levelItem_1->setPosition(Vec2(x - 96, y - 32));
+		levelItem_2->setPosition(Vec2(x - 160, y - 32));
+		levelItem_3->setPosition(Vec2(x - 224, y - 32));
 		valid = !valid;
 	}
 	else { // 相反
-		levelItem_1->setPosition(Vec2(608, 736));
-		levelItem_2->setPosition(Vec2(544, 736));
-		levelItem_3->setPosition(Vec2(480, 736));
+		levelItem_1->setPosition(Vec2(x - 96, y + 64));
+		levelItem_2->setPosition(Vec2(x - 160, y + 64));
+		levelItem_3->setPosition(Vec2(x - 224, y + 64));
 		valid = !valid;
 	}
 }

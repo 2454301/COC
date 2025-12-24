@@ -30,6 +30,12 @@ public:
 	// 更新资源标签
 	void updateResourceLabels();
 
+	// 高亮显示相关函数
+	void showBuildingOutlines();
+	void hideBuildingOutlines();
+	void showGridArea();
+	void hideGridArea();
+
 	// 训练的兵种数量
 	int _numOfBarbarians = 0;
 	int _numOfArchers = 0;
@@ -47,6 +53,10 @@ private:
 	// 金币、圣水数量标签
 	cocos2d::Label* _goldLabel = nullptr;
 	cocos2d::Label* _elixirLabel = nullptr;
+
+	// 高亮显示相关
+	cocos2d::DrawNode* _buildingOutlineDrawNode = nullptr;
+	cocos2d::DrawNode* _gridAreaDrawNode = nullptr;
 
 	// 关卡系统相关菜单按钮及回调函数
 	cocos2d::MenuItemImage* levelItem;

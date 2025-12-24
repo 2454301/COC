@@ -22,11 +22,14 @@ bool Game::init() {
         return false;
     }
 
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    float x = visibleSize.width;
+    float y = visibleSize.height;
+
     // 添加地图
-    auto map = TMXTiledMap::create("COCMap.tmx");
+    auto map = TMXTiledMap::create("COCmap1.tmx");
     map->setAnchorPoint(Vec2::ZERO);
     map->setPosition(Vec2::ZERO);
-    map->setScale(0.5);
     this->addChild(map, -2);
 
     // 初始化建筑
@@ -38,16 +41,16 @@ bool Game::init() {
 
     // 设置兵种数量标签
     _barbarianLabel = Label::createWithTTF("Barbarian:0", "fonts/Marker Felt.ttf", 18);
-    _barbarianLabel->setPosition(Vec2(64, 688));
+    _barbarianLabel->setPosition(Vec2(64, y - 16));
     this->addChild(_barbarianLabel, 11);
     _archerLabel = Label::createWithTTF("Arhcer:0", "fonts/Marker Felt.ttf", 18);
-    _archerLabel->setPosition(Vec2(64, 656));
+    _archerLabel->setPosition(Vec2(64, y - 48));
     this->addChild(_archerLabel, 11);
     _giantLabel = Label::createWithTTF("Giant:0", "fonts/Marker Felt.ttf", 18);
-    _giantLabel->setPosition(Vec2(64, 624));
+    _giantLabel->setPosition(Vec2(64, y - 80));
     this->addChild(_giantLabel, 11);
     _goblinLabel = Label::createWithTTF("Goblin:0", "fonts/Marker Felt.ttf", 18);
-    _goblinLabel->setPosition(Vec2(64, 592));
+    _goblinLabel->setPosition(Vec2(64, y - 112));
     this->addChild(_goblinLabel, 11);
 
     updateTroopLabels();
@@ -156,14 +159,17 @@ void Game::updateTroopLabels() {
 // 初始化建筑
 // 第一关的建筑布局
 void Level_1::createInitialBuildings() {
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    float x = visibleSize.width;
+    float y = visibleSize.height;
 
     auto townHall = Building::createTownHall();
-    townHall->setPosition(Vec2(368, 368));
+    townHall->setPosition(Vec2(1040, 592));
     this->addChild(townHall);
     _buildings.push_back(townHall);
 
     auto cannon = Building::createCannon();
-    cannon->setPosition(Vec2(448, 448));
+    cannon->setPosition(Vec2(1120, 672));
     this->addChild(cannon);
     _buildings.push_back(cannon);
 }
@@ -210,6 +216,42 @@ void Game::setupTouchEvents() {
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
+// 判断点击位置是否合法
+bool Game::isPointInDiamond(const cocos2d::Vec2& point) {
+    // 菱形四个顶点
+    const cocos2d::Vec2 A(320, 480);
+    const cocos2d::Vec2 B(1024, 1024);
+    const cocos2d::Vec2 C(1728, 480);
+    const cocos2d::Vec2 D(1024, -64);
+
+    // 使用向量叉积法判断点是否在凸多边形内
+    // 对于凸多边形，如果点P在每条边的同一侧（都左侧或都右侧），则在多边形内
+
+    // 计算向量
+    cocos2d::Vec2 AB = B - A;
+    cocos2d::Vec2 AP = point - A;
+
+    cocos2d::Vec2 BC = C - B;
+    cocos2d::Vec2 BP = point - B;
+
+    cocos2d::Vec2 CD = D - C;
+    cocos2d::Vec2 CP = point - C;
+
+    cocos2d::Vec2 DA = A - D;
+    cocos2d::Vec2 DP = point - D;
+
+    // 计算叉积
+    float cross1 = AB.x * AP.y - AB.y * AP.x;
+    float cross2 = BC.x * BP.y - BC.y * BP.x;
+    float cross3 = CD.x * CP.y - CD.y * CP.x;
+    float cross4 = DA.x * DP.y - DA.y * DP.x;
+
+    // 如果所有叉积同号，则点在菱形内
+    // 取逆时针顺序，所以所有叉积应该都大于0
+    return (cross1 >= 0 && cross2 >= 0 && cross3 >= 0 && cross4 >= 0) ||
+        (cross1 <= 0 && cross2 <= 0 && cross3 <= 0 && cross4 <= 0);
+}
+
 // 点击开始
 bool Game::onTouchBegan(Touch* touch, Event* event) {
     return true; // 必须返回true，onTouchEnded才会被调用
@@ -222,6 +264,11 @@ void Game::onTouchEnded(Touch* touch, Event* event) {
     }
 
     Vec2 touchLocation = touch->getLocation(); // 获取点击位置坐标
+
+    // 点击位置不在菱形内，则点击无效
+    if (!isPointInDiamond(touchLocation)) {
+        return;
+    }
 
     Soldier* newSoldier = nullptr;
     bool canPlace = false;

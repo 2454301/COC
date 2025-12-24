@@ -54,6 +54,9 @@ protected:
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
     void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
 
+    // 判断点是否在菱形范围内
+    bool isPointInDiamond(const cocos2d::Vec2& point);
+
     // 创建初始建筑（虚函数，由子类重写）
     virtual void createInitialBuildings();
     // 创建兵种菜单
