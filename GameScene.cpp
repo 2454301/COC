@@ -1,13 +1,13 @@
-#include "GameScene.h"
+ï»¿#include "GameScene.h"
 #include "Soldier.h"
 #include "Building.h"
 
 USING_NS_CC;
 
-// ÕâÀïÊÇÓÎÏ·Ö÷³¡¾°£¬ÏÖÔÚ»¹Ã»ÓĞ±³¾°£¬»áÓĞ±øÖÖÑ¡Ôñ²Ëµ¥ºÍ³õÊ¼³öÀ´µÄ½¨Öş
-// ¿ÉÑ¡Ôñ±øÖÖ²¢·ÅÖÃ£¬±øÖÖ»á°´ÕÕÂß¼­×Ô¶¯¹¥»÷
+// è¿™é‡Œæ˜¯æ¸¸æˆä¸»åœºæ™¯ï¼Œç°åœ¨è¿˜æ²¡æœ‰èƒŒæ™¯ï¼Œä¼šæœ‰å…µç§é€‰æ‹©èœå•å’Œåˆå§‹å‡ºæ¥çš„å»ºç­‘
+// å¯é€‰æ‹©å…µç§å¹¶æ”¾ç½®ï¼Œå…µç§ä¼šæŒ‰ç…§é€»è¾‘è‡ªåŠ¨æ”»å‡»
 
-// ´´½¨³¡¾°£¨ºóĞø¿ÉÌí¼Ó¸ü¶à¹Ø¿¨£©
+// åˆ›å»ºåœºæ™¯ï¼ˆåç»­å¯æ·»åŠ æ›´å¤šå…³å¡ï¼‰
 Scene* Game::createScene() {
     return Game::create();
 }
@@ -16,7 +16,7 @@ Scene* Level_1::createScene() {
     return Level_1::create();
 }
 
-// ³õÊ¼»¯
+// åˆå§‹åŒ–
 bool Game::init() {
     if (!Scene::init()) {
         return false;
@@ -26,56 +26,56 @@ bool Game::init() {
     float x = visibleSize.width;
     float y = visibleSize.height;
 
-    // Ìí¼ÓµØÍ¼
+    // æ·»åŠ åœ°å›¾
     auto map = TMXTiledMap::create("COCmap1.tmx");
     map->setAnchorPoint(Vec2::ZERO);
     map->setPosition(Vec2::ZERO);
     this->addChild(map, -2);
 
-    // ³õÊ¼»¯½¨Öş
+    // åˆå§‹åŒ–å»ºç­‘
     createInitialBuildings();
-    // ´´½¨±øÖÖ²Ëµ¥
+    // åˆ›å»ºå…µç§èœå•
     createSoldierMenu();
-    // ×¢²á´¥ÃşÊÂ¼ş
+    // æ³¨å†Œè§¦æ‘¸äº‹ä»¶
     setupTouchEvents();
 
-    // ÉèÖÃ±øÖÖÊıÁ¿±êÇ©
-    _barbarianLabel = Label::createWithTTF("Barbarian:0", "fonts/Marker Felt.ttf", 18);
+    // è®¾ç½®å…µç§æ•°é‡æ ‡ç­¾
+    _barbarianLabel = Label::createWithTTF("Barbarian: 0", "fonts/Marker Felt.ttf", 18);
     _barbarianLabel->setPosition(Vec2(64, y - 16));
     this->addChild(_barbarianLabel, 11);
-    _archerLabel = Label::createWithTTF("Arhcer:0", "fonts/Marker Felt.ttf", 18);
+    _archerLabel = Label::createWithTTF("Arhcer: 0", "fonts/Marker Felt.ttf", 18);
     _archerLabel->setPosition(Vec2(64, y - 48));
     this->addChild(_archerLabel, 11);
-    _giantLabel = Label::createWithTTF("Giant:0", "fonts/Marker Felt.ttf", 18);
+    _giantLabel = Label::createWithTTF("Giant: 0", "fonts/Marker Felt.ttf", 18);
     _giantLabel->setPosition(Vec2(64, y - 80));
     this->addChild(_giantLabel, 11);
-    _goblinLabel = Label::createWithTTF("Goblin:0", "fonts/Marker Felt.ttf", 18);
+    _goblinLabel = Label::createWithTTF("Goblin: 0", "fonts/Marker Felt.ttf", 18);
     _goblinLabel->setPosition(Vec2(64, y - 112));
     this->addChild(_goblinLabel, 11);
 
     updateTroopLabels();
 
-    // ÆôÓÃÖğÖ¡¸üĞÂ
+    // å¯ç”¨é€å¸§æ›´æ–°
     this->scheduleUpdate();
 
     return true;
 }
 
 void Game::update(float dt) {
-    // ¶ÔºÏ·¨±øÖÖ¸üĞÂĞĞÎª
+    // å¯¹åˆæ³•å…µç§æ›´æ–°è¡Œä¸º
     for (auto soldier : _soldiers) {
         if (soldier && soldier->isAlive() && !soldier->isDestroyed()) {
             soldier->updateBehavior(dt);
         }
     }
-    // ¶ÔºÏ·¨½¨Öş¸üĞÂĞĞÎª
+    // å¯¹åˆæ³•å»ºç­‘æ›´æ–°è¡Œä¸º
     for (auto building : _buildings) {
         if (building && building->isAlive() && !building->isDestroyed()) {
             building->setSoldiers(_soldiers);
             building->updateBehavior(dt);
         }
     }
-    // ¼ì²â£º°ÑËÀÍöµÄ±øÖÖ´Ó¼¯ºÏÖĞÒÆ³ı
+    // æ£€æµ‹ï¼šæŠŠæ­»äº¡çš„å…µç§ä»é›†åˆä¸­ç§»é™¤
     auto s_it = _soldiers.begin();
     while (s_it != _soldiers.end()) {
         auto soldier = *s_it;
@@ -86,7 +86,7 @@ void Game::update(float dt) {
             ++s_it;
         }
     }
-    // ¼ì²â£º°Ñ´İ»ÙµÄ½¨Öş´Ó¼¯ºÏÖĞÒÆ³ı
+    // æ£€æµ‹ï¼šæŠŠæ‘§æ¯çš„å»ºç­‘ä»é›†åˆä¸­ç§»é™¤
     auto b_it = _buildings.begin();
     while (b_it != _buildings.end()) {
         auto building = *b_it;
@@ -101,8 +101,8 @@ void Game::update(float dt) {
         }
     }
 
-    // Ê¤ÀûÅĞ¶ÏÂß¼­
-    if (_buildings.empty()) { // ³¡ÉÏ½¨Öş¾ù±»´İ»Ù
+    // èƒœåˆ©åˆ¤æ–­é€»è¾‘
+    if (_buildings.empty()) { // åœºä¸Šå»ºç­‘å‡è¢«æ‘§æ¯
         auto victory = Sprite::create("Victory.png");
         victory->setPosition(Vec2(352, 352));
         this->addChild(victory, 11);
@@ -114,10 +114,10 @@ void Game::update(float dt) {
         auto popScene = CallFunc::create([]() {
             Director::getInstance()->popScene();
             });
-        this->runAction(Sequence::create(delay, popScene, nullptr)); // ²¥·ÅÊ¤ÀûCG
+        this->runAction(Sequence::create(delay, popScene, nullptr)); // æ’­æ”¾èƒœåˆ©CG
     }
     
-    // Ê§°ÜÅĞ¶ÏÂß¼­
+    // å¤±è´¥åˆ¤æ–­é€»è¾‘
     bool hasAliveSoldiers = false;
     for (auto soldier : _soldiers) {
         if (soldier && soldier->isAlive() && !soldier->isDestroyed()) {
@@ -129,7 +129,7 @@ void Game::update(float dt) {
     bool hasAvailableTroops = (_availableBarbarians > 0 || _availableArchers > 0 ||
         _availableGiants > 0 || _availableGoblins > 0);
 
-    if (!hasAliveSoldiers && !hasAvailableTroops) { // ³¡ÉÏ±øÖÖ¾ùÕóÍö£¬ÇÒ¿ÉÊ¹ÓÃ±øÖÖÒÑºÄ¾¡
+    if (!hasAliveSoldiers && !hasAvailableTroops) { // åœºä¸Šå…µç§å‡é˜µäº¡ï¼Œä¸”å¯ä½¿ç”¨å…µç§å·²è€—å°½
         auto defeat = Sprite::create("Defeat.png");
         defeat->setPosition(Vec2(352, 352));
         this->addChild(defeat, 11);
@@ -140,24 +140,24 @@ void Game::update(float dt) {
         auto popScene = CallFunc::create([]() {
             Director::getInstance()->popScene();
             });
-        this->runAction(Sequence::create(delay, popScene, nullptr)); // ²¥·ÅÕ½°ÜCG
+        this->runAction(Sequence::create(delay, popScene, nullptr)); // æ’­æ”¾æˆ˜è´¥CG
     }
 }
 
 void Game::createInitialBuildings() {
-    // »ùÀàÎª¿ÕÊµÏÖ£¬ÓÉ×ÓÀàÖØĞ´
+    // åŸºç±»ä¸ºç©ºå®ç°ï¼Œç”±å­ç±»é‡å†™
 }
 
-// ¸üĞÂ±øÖÖÊıÁ¿±êÇ©
+// æ›´æ–°å…µç§æ•°é‡æ ‡ç­¾
 void Game::updateTroopLabels() {
-    _barbarianLabel->setString(StringUtils::format("Barbarian:%d", _availableBarbarians));
-    _archerLabel->setString(StringUtils::format("Archer:%d", _availableArchers));
-    _giantLabel->setString(StringUtils::format("Giant:%d", _availableGiants));
-    _goblinLabel->setString(StringUtils::format("Goblin:%d", _availableGoblins));
+    _barbarianLabel->setString(StringUtils::format("Barbarian: %d", _availableBarbarians));
+    _archerLabel->setString(StringUtils::format("Archer: %d", _availableArchers));
+    _giantLabel->setString(StringUtils::format("Giant: %d", _availableGiants));
+    _goblinLabel->setString(StringUtils::format("Goblin: %d", _availableGoblins));
 }
 
-// ³õÊ¼»¯½¨Öş
-// µÚÒ»¹ØµÄ½¨Öş²¼¾Ö
+// åˆå§‹åŒ–å»ºç­‘
+// ç¬¬ä¸€å…³çš„å»ºç­‘å¸ƒå±€
 void Level_1::createInitialBuildings() {
     auto visibleSize = Director::getInstance()->getVisibleSize();
     float x = visibleSize.width;
@@ -174,60 +174,60 @@ void Level_1::createInitialBuildings() {
     _buildings.push_back(cannon);
 }
 
-// ´´½¨±øÖÖÑ¡Ôñ²Ëµ¥
+// åˆ›å»ºå…µç§é€‰æ‹©èœå•
 void Game::createSoldierMenu() {
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
-    // Ò°ÂùÈË±øÖÖÑ¡Ôñ°´Å¥
+    // é‡è›®äººå…µç§é€‰æ‹©æŒ‰é’®
     auto barbarianBtn = MenuItemImage::create("Barbarian.png", "Barbarian.png", CC_CALLBACK_1(Game::onBarbarianClicked, this));
     barbarianBtn->setPosition(visibleSize.width * 0.2, 50);
     barbarianBtn->setScale(1.5);
 
-    // ¹­¼ıÊÖ±øÖÖÑ¡Ôñ°´Å¥
+    // å¼“ç®­æ‰‹å…µç§é€‰æ‹©æŒ‰é’®
     auto archerBtn = MenuItemImage::create("Archer.png", "Archer.png", CC_CALLBACK_1(Game::onArcherClicked, this));
     archerBtn->setPosition(visibleSize.width * 0.4, 50);
     archerBtn->setScale(1.5);
 
-    // ¾ŞÈË±øÖÖÑ¡Ôñ°´Å¥
+    // å·¨äººå…µç§é€‰æ‹©æŒ‰é’®
     auto giantBtn = MenuItemImage::create("Giant.png", "Giant.png", CC_CALLBACK_1(Game::onGiantClicked, this));
     giantBtn->setPosition(visibleSize.width * 0.6, 50);
     giantBtn->setScale(1.5);
 
-    // ¸ç²¼ÁÖ±øÖÖÑ¡Ôñ°´Å¥
+    // å“¥å¸ƒæ—å…µç§é€‰æ‹©æŒ‰é’®
     auto goblinBtn = MenuItemImage::create("Goblin.png", "Goblin.png", CC_CALLBACK_1(Game::onGoblinClicked, this));
     goblinBtn->setPosition(visibleSize.width * 0.8, 50);
     goblinBtn->setScale(1.5);
 
-    // È«²¿Ìí¼Óµ½²Ëµ¥
+    // å…¨éƒ¨æ·»åŠ åˆ°èœå•
     auto menu = Menu::create(barbarianBtn, archerBtn, giantBtn, goblinBtn, nullptr);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 11);
 }
 
-// ×¢²á´¥ÃşÊÂ¼ş
+// æ³¨å†Œè§¦æ‘¸äº‹ä»¶
 void Game::setupTouchEvents() {
     auto listener = EventListenerTouchOneByOne::create();
 
     listener->onTouchBegan = CC_CALLBACK_2(Game::onTouchBegan, this);
     listener->onTouchEnded = CC_CALLBACK_2(Game::onTouchEnded, this);
 
-    listener->setSwallowTouches(true); // ×èÖ¹ÊÂ¼ş´«µİ
+    listener->setSwallowTouches(true); // é˜»æ­¢äº‹ä»¶ä¼ é€’
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
-// ÅĞ¶Ïµã»÷Î»ÖÃÊÇ·ñºÏ·¨
+// åˆ¤æ–­ç‚¹å‡»ä½ç½®æ˜¯å¦åˆæ³•
 bool Game::isPointInDiamond(const cocos2d::Vec2& point) {
-    // ÁâĞÎËÄ¸ö¶¥µã
+    // è±å½¢å››ä¸ªé¡¶ç‚¹
     const cocos2d::Vec2 A(320, 480);
     const cocos2d::Vec2 B(1024, 1024);
     const cocos2d::Vec2 C(1728, 480);
     const cocos2d::Vec2 D(1024, -64);
 
-    // Ê¹ÓÃÏòÁ¿²æ»ı·¨ÅĞ¶ÏµãÊÇ·ñÔÚÍ¹¶à±ßĞÎÄÚ
-    // ¶ÔÓÚÍ¹¶à±ßĞÎ£¬Èç¹ûµãPÔÚÃ¿Ìõ±ßµÄÍ¬Ò»²à£¨¶¼×ó²à»ò¶¼ÓÒ²à£©£¬ÔòÔÚ¶à±ßĞÎÄÚ
+    // ä½¿ç”¨å‘é‡å‰ç§¯æ³•åˆ¤æ–­ç‚¹æ˜¯å¦åœ¨å‡¸å¤šè¾¹å½¢å†…
+    // å¯¹äºå‡¸å¤šè¾¹å½¢ï¼Œå¦‚æœç‚¹Påœ¨æ¯æ¡è¾¹çš„åŒä¸€ä¾§ï¼ˆéƒ½å·¦ä¾§æˆ–éƒ½å³ä¾§ï¼‰ï¼Œåˆ™åœ¨å¤šè¾¹å½¢å†…
 
-    // ¼ÆËãÏòÁ¿
+    // è®¡ç®—å‘é‡
     cocos2d::Vec2 AB = B - A;
     cocos2d::Vec2 AP = point - A;
 
@@ -240,32 +240,32 @@ bool Game::isPointInDiamond(const cocos2d::Vec2& point) {
     cocos2d::Vec2 DA = A - D;
     cocos2d::Vec2 DP = point - D;
 
-    // ¼ÆËã²æ»ı
+    // è®¡ç®—å‰ç§¯
     float cross1 = AB.x * AP.y - AB.y * AP.x;
     float cross2 = BC.x * BP.y - BC.y * BP.x;
     float cross3 = CD.x * CP.y - CD.y * CP.x;
     float cross4 = DA.x * DP.y - DA.y * DP.x;
 
-    // Èç¹ûËùÓĞ²æ»ıÍ¬ºÅ£¬ÔòµãÔÚÁâĞÎÄÚ
-    // È¡ÄæÊ±ÕëË³Ğò£¬ËùÒÔËùÓĞ²æ»ıÓ¦¸Ã¶¼´óÓÚ0
+    // å¦‚æœæ‰€æœ‰å‰ç§¯åŒå·ï¼Œåˆ™ç‚¹åœ¨è±å½¢å†…
+    // å–é€†æ—¶é’ˆé¡ºåºï¼Œæ‰€ä»¥æ‰€æœ‰å‰ç§¯åº”è¯¥éƒ½å¤§äº0
     return (cross1 >= 0 && cross2 >= 0 && cross3 >= 0 && cross4 >= 0) ||
         (cross1 <= 0 && cross2 <= 0 && cross3 <= 0 && cross4 <= 0);
 }
 
-// µã»÷¿ªÊ¼
+// ç‚¹å‡»å¼€å§‹
 bool Game::onTouchBegan(Touch* touch, Event* event) {
-    return true; // ±ØĞë·µ»Øtrue£¬onTouchEnded²Å»á±»µ÷ÓÃ
+    return true; // å¿…é¡»è¿”å›trueï¼ŒonTouchEndedæ‰ä¼šè¢«è°ƒç”¨
 }
 
-// ·ÅÖÃ±øÖÖ»áµ÷ÓÃ´Ë´¦º¯Êı
+// æ”¾ç½®å…µç§ä¼šè°ƒç”¨æ­¤å¤„å‡½æ•°
 void Game::onTouchEnded(Touch* touch, Event* event) {
     if (!_isPlacingSoldier || _selectedSoldierType == SOLDIER_NONE) {
         return;
     }
 
-    Vec2 touchLocation = touch->getLocation(); // »ñÈ¡µã»÷Î»ÖÃ×ø±ê
+    Vec2 touchLocation = touch->getLocation(); // è·å–ç‚¹å‡»ä½ç½®åæ ‡
 
-    // µã»÷Î»ÖÃ²»ÔÚÁâĞÎÄÚ£¬Ôòµã»÷ÎŞĞ§
+    // ç‚¹å‡»ä½ç½®ä¸åœ¨è±å½¢å†…ï¼Œåˆ™ç‚¹å‡»æ— æ•ˆ
     if (!isPointInDiamond(touchLocation)) {
         return;
     }
@@ -273,7 +273,7 @@ void Game::onTouchEnded(Touch* touch, Event* event) {
     Soldier* newSoldier = nullptr;
     bool canPlace = false;
 
-    // È·¶¨Ñ¡ÔñµÄÊÇÄÄÖÖ±øÖÖ
+    // ç¡®å®šé€‰æ‹©çš„æ˜¯å“ªç§å…µç§
     switch (_selectedSoldierType) {
     case SOLDIER_BARBARIAN:
         if (_availableBarbarians > 0) {
@@ -316,25 +316,25 @@ void Game::onTouchEnded(Touch* touch, Event* event) {
     }
 
     if (newSoldier && canPlace) {
-        newSoldier->setPosition(touchLocation); // ÔÚµã»÷Î»ÖÃ·ÅÖÃ±øÖÖ
+        newSoldier->setPosition(touchLocation); // åœ¨ç‚¹å‡»ä½ç½®æ”¾ç½®å…µç§
 
-        newSoldier->setBuildings(_buildings); // °Ñ³¡ÉÏµÄ½¨Öş¼¯ºÏ´«µİ¸øÕâ¸ö±ø£¬ÈÃËüÑ¡Ôñ¹¥»÷Ä¿±ê
+        newSoldier->setBuildings(_buildings); // æŠŠåœºä¸Šçš„å»ºç­‘é›†åˆä¼ é€’ç»™è¿™ä¸ªå…µï¼Œè®©å®ƒé€‰æ‹©æ”»å‡»ç›®æ ‡
 
         this->addChild(newSoldier);
         _soldiers.push_back(newSoldier);
 
-        updateTroopLabels(); // ¸üĞÂ
+        updateTroopLabels(); // æ›´æ–°
     }
 }
 
-// ÒÔÏÂ´úÂëÖØ¸´½Ï¶à£¬ÒÔºóÓÅ»¯£¬ÏÖÔÚÏÈÅÜÆğÀ´
+// ä»¥ä¸‹ä»£ç é‡å¤è¾ƒå¤šï¼Œä»¥åä¼˜åŒ–ï¼Œç°åœ¨å…ˆè·‘èµ·æ¥
 
-// µã»÷Ò°ÂùÈË°´Å¥ºóµ÷ÓÃ
+// ç‚¹å‡»é‡è›®äººæŒ‰é’®åè°ƒç”¨
 void Game::onBarbarianClicked(Ref* sender) {
     auto button = dynamic_cast<MenuItemImage*>(sender);
     if (!button) return;
 
-    // Èç¹ûÒÑ¾­Ñ¡ÔÚÒ°ÂùÈË°´Å¥ÉÏ£¬¾ÍÈ¡ÏûÑ¡Ôñ£¬Í¼±êÏòÏÂÒÆ¶¯Ò»µã
+    // å¦‚æœå·²ç»é€‰åœ¨é‡è›®äººæŒ‰é’®ä¸Šï¼Œå°±å–æ¶ˆé€‰æ‹©ï¼Œå›¾æ ‡å‘ä¸‹ç§»åŠ¨ä¸€ç‚¹
     if (_selectedSoldierButton == button) {
         _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
                                                           _selectedSoldierButton->getPositionY() - 50));
@@ -342,7 +342,7 @@ void Game::onBarbarianClicked(Ref* sender) {
         _selectedSoldierType = SOLDIER_NONE;
         _selectedSoldierButton = nullptr;
     }
-    // ·ñÔò¸üĞÂµ½Õâ¸ö°´Å¥£¬Í¼±êÏòÉÏÒÆ¶¯Ò»µã
+    // å¦åˆ™æ›´æ–°åˆ°è¿™ä¸ªæŒ‰é’®ï¼Œå›¾æ ‡å‘ä¸Šç§»åŠ¨ä¸€ç‚¹
     else {
         if (_selectedSoldierButton != nullptr) {
             _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
@@ -356,7 +356,7 @@ void Game::onBarbarianClicked(Ref* sender) {
     }
 }
 
-// ¹­¼ıÊÖ°´Å¥£¬Âß¼­Í¬ÉÏ
+// å¼“ç®­æ‰‹æŒ‰é’®ï¼Œé€»è¾‘åŒä¸Š
 void Game::onArcherClicked(Ref* sender) {
     auto button = dynamic_cast<MenuItemImage*>(sender);
     if (!button) return;

@@ -1,4 +1,4 @@
-#include "Soldier.h"
+ï»¿#include "Soldier.h"
 #include "Building.h"
 
 Building* Building::createTownHall() {
@@ -11,17 +11,18 @@ Building* Building::createTownHall() {
 	return nullptr;
 }
 
-// ´ó±¾Óª³õÊ¼»¯
+// å¤§æœ¬è¥åˆå§‹åŒ–
 bool Building::initTownHall() {
 	if (!GameObject::init()) {
 		return false;
 	}
 
-	_health = _maxHealth = 500.0f; // 500ÑªÁ¿
-	_type = BUILDING_RESOURCE; // ´ó±¾ÓªÊÇ×ÊÔ´Àà½¨Öş
+	_health = _maxHealth = 500.0f; // 500è¡€é‡
+	_type = BUILDING_RESOURCE; // å¤§æœ¬è¥æ˜¯èµ„æºç±»å»ºç­‘
+	_size = 96;
 
-	_sprite = cocos2d::Sprite::create("COCTown Hall.png"); // ÕâÀïĞèÒªÒ»¸öÍ¼Æ¬ÎÄ¼ş
-	// Ìí¼Ó½ø³¡¾°²¢µ÷ÕûÒ»Ğ©²ÎÊı
+	_sprite = cocos2d::Sprite::create("COCTown Hall.png"); // è¿™é‡Œéœ€è¦ä¸€ä¸ªå›¾ç‰‡æ–‡ä»¶
+	// æ·»åŠ è¿›åœºæ™¯å¹¶è°ƒæ•´ä¸€äº›å‚æ•°
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
 	return true;
@@ -43,12 +44,11 @@ bool Building::initCannon() {
 	}
 
 	_health = _maxHealth = 300.0f;
-	_type = BUILDING_DEFENSE; // ¼ÓÅ©ÅÚÊÇ·ÀÓùÀà½¨Öş
+	_type = BUILDING_DEFENSE; // åŠ å†œç‚®æ˜¯é˜²å¾¡ç±»å»ºç­‘
 
 	_attack = 40.0f;
 	_range = 250.0f;
-
-	_resourceCost = 100.0f;
+	_size = 64;
 
 	_sprite = cocos2d::Sprite::create("COCCannon.png");
 	this->addChild(_sprite);
@@ -72,8 +72,7 @@ bool Building::initArmyCamp() {
 	}
 
 	_health = _maxHealth = 300.0f;
-
-	_resourceCost = 150.0f;
+	_size = 64;
 
 	_sprite = cocos2d::Sprite::create("ArmyCamp.png");
 	this->addChild(_sprite);
@@ -97,8 +96,7 @@ bool Building::initBarracks() {
 	}
 
 	_health = _maxHealth = 300.0f;
-
-	_resourceCost = 300.0f;
+	_size = 96;
 
 	_sprite = cocos2d::Sprite::create("COCBarracks.png");
 	this->addChild(_sprite);
@@ -124,8 +122,7 @@ bool Building::initGoldMine() {
 	_health = _maxHealth = 300.0f;
 	_type = BUILDING_RESOURCE;
 
-	_resourceCost = 100.0f;
-	_resourceProduction = 100.0f;
+	_size = 64;
 
 	_sprite = cocos2d::Sprite::create("COCGold Mine.png");
 	this->addChild(_sprite);
@@ -151,8 +148,7 @@ bool Building::initElixirCollector() {
 	_health = _maxHealth = 300.0f;
 	_type = BUILDING_RESOURCE;
 
-	_resourceCost = 100.0f;
-	_resourceProduction = 100.0f;
+	_size = 64;
 
 	_sprite = cocos2d::Sprite::create("COCElixir Collector.png");
 	this->addChild(_sprite);
@@ -160,7 +156,7 @@ bool Building::initElixirCollector() {
 	return true;
 }
 
-// Ñ°ÕÒµÚÒ»¸ö½øÈë¹¥»÷·¶Î§µÄ±øÖÖ
+// å¯»æ‰¾ç¬¬ä¸€ä¸ªè¿›å…¥æ”»å‡»èŒƒå›´çš„å…µç§
 GameObject* Building::findFirstSoldier() {
 	if (_availableSoldiers.empty() || _type != BUILDING_DEFENSE) {
 		return nullptr;
@@ -173,7 +169,7 @@ GameObject* Building::findFirstSoldier() {
 		if (soldier && soldier->isAlive() && !soldier->isDestroyed()) {
 			float distance = myPos.distance(soldier->getPosition());
 			if (distance <= _range) {
-				first = soldier; // Ö¸ÏòÄ¿±ê±øÖÖ
+				first = soldier; // æŒ‡å‘ç›®æ ‡å…µç§
 				return first;
 			}
 		}
@@ -181,7 +177,7 @@ GameObject* Building::findFirstSoldier() {
 	return nullptr;
 }
 
-// ÉèÖÃ¹¥»÷Ä¿±ê
+// è®¾ç½®æ”»å‡»ç›®æ ‡
 void Building::attack(GameObject* target) {
 	if (target == nullptr || !target->isAlive()) {
 		return;
@@ -197,7 +193,7 @@ void Building::stop() {
 	_target = nullptr;
 }
 
-// ĞĞÎª¸üĞÂÏµÍ³
+// è¡Œä¸ºæ›´æ–°ç³»ç»Ÿ
 void Building::updateBehavior(float dt) {
 	if (!isAlive()) {
 		return;
@@ -223,7 +219,7 @@ void Building::updateBehavior(float dt) {
 	}
 }
 
-// ÊÜ¹¥»÷ÅĞ¶¨
+// å—æ”»å‡»åˆ¤å®š
 void Building::onHit(float damage) {
 	_health -= damage;
 	if (!isAlive()) {
@@ -231,7 +227,7 @@ void Building::onHit(float damage) {
 	}
 }
 
-// ËÀÁË¾ÍÒÆ³ıµô
+// æ­»äº†å°±ç§»é™¤æ‰
 void Building::onDestroy() {
 	GameObject::onDestroy();
 
@@ -242,7 +238,7 @@ void Building::onDestroy() {
 		});
 
 	auto sequence = cocos2d::Sequence::create(
-		cocos2d::DelayTime::create(0.1f), // ÑÓ³Ù0.1Ãë
+		cocos2d::DelayTime::create(0.1f), // å»¶è¿Ÿ0.1ç§’
 		removeAction,
 		nullptr
 	);

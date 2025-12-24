@@ -1,24 +1,24 @@
-// Í·ÎÄ¼þÌ×Â·
+ï»¿// å¤´æ–‡ä»¶å¥—è·¯
 #ifndef __HELLOWORLD_SCENE_H__
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
 
-// Ò»¸öHelloWorldÀà£¬×÷ÓÃÊÇÏÔÊ¾¿ªÆÁ»­Ãæ
+// ä¸€ä¸ªHelloWorldç±»ï¼Œä½œç”¨æ˜¯æ˜¾ç¤ºå¼€å±ç”»é¢
 class HelloWorld : public cocos2d::Scene {
 public:
-    // ³¡¾°´´½¨º¯Êý
+    // åœºæ™¯åˆ›å»ºå‡½æ•°
     static cocos2d::Scene* createScene();
 
-    // ³õÊ¼»¯º¯Êý£¬´Ë´¦ÎªÐé£¬ÐèÒªÔÚcppÖÐÐ´¾ßÌåÊµÏÖ
+    // åˆå§‹åŒ–å‡½æ•°ï¼Œæ­¤å¤„ä¸ºè™šï¼Œéœ€è¦åœ¨cppä¸­å†™å…·ä½“å®žçŽ°
     virtual bool init();
 
-    // µã»÷·´À¡º¯Êý
+    // ç‚¹å‡»åé¦ˆå‡½æ•°
     void menuCloseCallback(cocos2d::Ref* pSender);
 
-    // Ì×Â·£¬×÷ÓÃÊÇÎª´ËÀàÌí¼ÓÒ»¸öcreate()º¯Êý
+    // å¥—è·¯ï¼Œä½œç”¨æ˜¯ä¸ºæ­¤ç±»æ·»åŠ ä¸€ä¸ªcreate()å‡½æ•°
     CREATE_FUNC(HelloWorld);
 };
 
-// Í·ÎÄ¼þÌ×Â·
+// å¤´æ–‡ä»¶å¥—è·¯
 #endif // __HELLOWORLD_SCENE_H__

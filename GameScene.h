@@ -1,4 +1,4 @@
-#ifndef __GAME_SCENE_H__
+ï»¿#ifndef __GAME_SCENE_H__
 #define __GAME_SCENE_H__
 
 #include "cocos2d.h"
@@ -6,17 +6,17 @@
 #include "Building.h"
 #include "VillageScene.h"
 
-// ÏÔÊ¾¹Ø¿¨Ö÷³¡¾°
+// æ˜¾ç¤ºå…³å¡ä¸»åœºæ™¯
 class Game : public cocos2d::Scene {
 public:
-    // ³¡¾°´´½¨
+    // åœºæ™¯åˆ›å»º
     static cocos2d::Scene* createScene();
     CREATE_FUNC(Game);
 
-    // ³õÊ¼»¯½çÃæ
+    // åˆå§‹åŒ–ç•Œé¢
     virtual bool init();
 
-    // Ã¶¾ÙÀà£¬±ãÓÚÑ¡Ôñ
+    // æšä¸¾ç±»ï¼Œä¾¿äºé€‰æ‹©
     enum SoldierType {
         SOLDIER_NONE,
         SOLDIER_BARBARIAN,
@@ -25,7 +25,7 @@ public:
         SOLDIER_GOBLIN
     };
 
-    // ÓÃÓÚÔÚ¹Ø¿¨´´½¨´¦½«ÑµÁ·µÄ±øÖÖ¶ÁÈ¡ÖÁ¹Ø¿¨ÖĞ
+    // ç”¨äºåœ¨å…³å¡åˆ›å»ºå¤„å°†è®­ç»ƒçš„å…µç§è¯»å–è‡³å…³å¡ä¸­
     void setTroopCounts(int barbarians, int archers, int giants, int goblins) {
         _availableBarbarians = barbarians;
         _availableArchers = archers;
@@ -34,82 +34,84 @@ public:
         updateTroopLabels();
     }
 
-    // ÓëÖ÷´å×¯½¨Á¢ÁªÏµ
+    // ä¸ä¸»æ‘åº„å»ºç«‹è”ç³»
     void setVillage(Village* village) {
         _village = village;
     }
 
-    // ÓëÖ÷´å×¯¹ØÁª£ºÕ½¶·½áÊøºó½«Ê£Óà±øÖÖ·´À¡»ØÖ÷´å×¯
+    // ä¸ä¸»æ‘åº„å…³è”ï¼šæˆ˜æ–—ç»“æŸåå°†å‰©ä½™å…µç§åé¦ˆå›ä¸»æ‘åº„
     void updateVillageTroopCounts() {
         if (_village) {
             _village->_numOfBarbarians = _availableBarbarians;
             _village->_numOfArchers = _availableArchers;
             _village->_numOfGiants = _availableGiants;
             _village->_numOfGoblins = _availableGoblins;
+
+            _village->updateTroopLabels();
         }
     }
 
 protected:
-    // ´¥Ãş¿ªÊ¼ºÍ½áÊø¼ì²âº¯Êı
+    // è§¦æ‘¸å¼€å§‹å’Œç»“æŸæ£€æµ‹å‡½æ•°
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
     void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
 
-    // ÅĞ¶ÏµãÊÇ·ñÔÚÁâĞÎ·¶Î§ÄÚ
+    // åˆ¤æ–­ç‚¹æ˜¯å¦åœ¨è±å½¢èŒƒå›´å†…
     bool isPointInDiamond(const cocos2d::Vec2& point);
 
-    // ´´½¨³õÊ¼½¨Öş£¨Ğéº¯Êı£¬ÓÉ×ÓÀàÖØĞ´£©
+    // åˆ›å»ºåˆå§‹å»ºç­‘ï¼ˆè™šå‡½æ•°ï¼Œç”±å­ç±»é‡å†™ï¼‰
     virtual void createInitialBuildings();
-    // ´´½¨±øÖÖ²Ëµ¥
+    // åˆ›å»ºå…µç§èœå•
     void createSoldierMenu();
-    // ×¢²á´¥ÃşÊÂ¼ş
+    // æ³¨å†Œè§¦æ‘¸äº‹ä»¶
     void setupTouchEvents();
-    // ¶à±øÖÖµã»÷¼ì²â
+    // å¤šå…µç§ç‚¹å‡»æ£€æµ‹
     void onBarbarianClicked(cocos2d::Ref* sender);
     void onArcherClicked(cocos2d::Ref* sender);
     void onGiantClicked(cocos2d::Ref* sender);
     void onGoblinClicked(cocos2d::Ref* sender);
 
-    // ¸üĞÂ±øÖÖÊıÁ¿±êÇ©
+    // æ›´æ–°å…µç§æ•°é‡æ ‡ç­¾
     void updateTroopLabels();
 
-    // ½¨Öş¼¯ºÏ
+    // å»ºç­‘é›†åˆ
     std::vector<Building*> _buildings;
-    // ±øÖÖ¼¯ºÏ
+    // å…µç§é›†åˆ
     std::vector<Soldier*> _soldiers;
-    // ±øÖÖÑ¡Ôñ°´Å¥
+    // å…µç§é€‰æ‹©æŒ‰é’®
     cocos2d::MenuItemImage* _selectedSoldierButton = nullptr;
-    // È·¶¨ÊÇ·ñ·ÅÖÃ±øÖÖ
+    // ç¡®å®šæ˜¯å¦æ”¾ç½®å…µç§
     bool _isPlacingSoldier = false;
-    // È·¶¨·ÅÖÃµÄÊÇÄÄÖÖ±øÖÖ
+    // ç¡®å®šæ”¾ç½®çš„æ˜¯å“ªç§å…µç§
     SoldierType _selectedSoldierType = SOLDIER_NONE;
 
-    // ±øÖÖÊıÁ¿
+    // å…µç§æ•°é‡
     int _availableBarbarians = 0;
     int _availableArchers = 0;
     int _availableGiants = 0;
     int _availableGoblins = 0;
 
-    // ±êÇ©
+    // æ ‡ç­¾
     cocos2d::Label* _barbarianLabel = nullptr;
     cocos2d::Label* _archerLabel = nullptr;
     cocos2d::Label* _giantLabel = nullptr;
     cocos2d::Label* _goblinLabel = nullptr;
 
-    // ÖğÖ¡µ÷ÓÃ£¬¸üĞÂĞĞÎª
+    // é€å¸§è°ƒç”¨ï¼Œæ›´æ–°è¡Œä¸º
     void update(float dt) override;
 
-    // ÓëÖ÷´å×¯ÁªÏµ
+    // ä¸ä¸»æ‘åº„è”ç³»
     Village* _village = nullptr;
 };
 
-// ¼Ì³Ğ×ÔGameÀàµÄ¹Ø¿¨£¬ºóĞø¿ÉÌí¼Ó2¡¢3¹Ø
+// ç»§æ‰¿è‡ªGameç±»çš„å…³å¡ï¼Œåç»­å¯æ·»åŠ 2ã€3å…³
 class Level_1 : public Game {
 public:
     static cocos2d::Scene* createScene();
     CREATE_FUNC(Level_1);
 
 protected:
-    void createInitialBuildings() override; // ÖØĞ´³õÊ¼½¨Öş²¼¾Ö
+    void createInitialBuildings() override; // é‡å†™åˆå§‹å»ºç­‘å¸ƒå±€
 };
 
 #endif // __GAME_SCENE_H__

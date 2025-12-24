@@ -1,73 +1,73 @@
-#ifndef __SOLDIER_H__
+ï»¿#ifndef __SOLDIER_H__
 #define __SOLDIER_H__
 
 #include "GameObject.h"
 
 class Building;
 
-// ¸÷º¯Êı¡¢³ÉÔ±±äÁ¿ÉùÃ÷
+// å„å‡½æ•°ã€æˆå‘˜å˜é‡å£°æ˜
 class Soldier : public GameObject {
 public:
-	// ±øÖÖ´´½¨
+	// å…µç§åˆ›å»º
 	static Soldier* createBarbarian();
 	static Soldier* createArcher();
 	static Soldier* createGiant();
 	static Soldier* createGoblin();
 
-	// ÉèÖÃ¹¥»÷Ä¿±ê
+	// è®¾ç½®æ”»å‡»ç›®æ ‡
 	void attack(GameObject* target);
-	// Í£Ö¹
+	// åœæ­¢
 	void stop();
 
-	// ´«Èë½¨Öş¼¯ºÏ
+	// ä¼ å…¥å»ºç­‘é›†åˆ
 	void setBuildings(const std::vector<Building*>& buildings) {
 		_availableBuildings = buildings;
 	}
 
-	// Ñ°ÕÒ×î½ü½¨Öş
+	// å¯»æ‰¾æœ€è¿‘å»ºç­‘
 	GameObject* findNearestBuilding();
 
-	// ¸üĞÂĞĞÎª
+	// æ›´æ–°è¡Œä¸º
 	void updateBehavior(float dt) override;
-	// ÊÜ¹¥»÷
+	// å—æ”»å‡»
 	void onHit(float damage) override;
-	// ±»´İ»Ù
+	// è¢«æ‘§æ¯
 	void onDestroy() override;
 
 private:
-	// ±øÖÖ³õÊ¼»¯
+	// å…µç§åˆå§‹åŒ–
 	bool initBarbarian();
 	bool initArcher();
 	bool initGiant();
 	bool initGoblin();
 
-	// ÉËº¦
+	// ä¼¤å®³
 	float _attack = 0.0f;
-	// ÒÆËÙ
+	// ç§»é€Ÿ
 	float _speed = 0.0f;
-	// ¹¥»÷·¶Î§
+	// æ”»å‡»èŒƒå›´
 	float _range = 0.0f;
-	// ÑµÁ·×ÊÔ´»¨·Ñ
+	// è®­ç»ƒèµ„æºèŠ±è´¹
 	float _resourceCost = 0.0f;
 
-	// ÅĞ¶ÏÊÇ·ñÒÆ¶¯
+	// åˆ¤æ–­æ˜¯å¦ç§»åŠ¨
 	bool _isMoving = false;
-	// ÅĞ¶ÏÊÇ·ñ¹¥»÷
+	// åˆ¤æ–­æ˜¯å¦æ”»å‡»
 	bool _isAttacking = false;
-	// ¹¥»÷Ä¿±ê£¨ÕâÀïÓÃµÄÀàÊÇGameObject£¬¿ÉÄÜ³öÏÖ±øÖÖ»¥Ïà¹¥»÷µÄÇé¿ö£¬ÒÔºóĞŞ¸´£©
+	// æ”»å‡»ç›®æ ‡ï¼ˆè¿™é‡Œç”¨çš„ç±»æ˜¯GameObjectï¼Œå¯èƒ½å‡ºç°å…µç§äº’ç›¸æ”»å‡»çš„æƒ…å†µï¼Œä»¥åä¿®å¤ï¼‰
 	GameObject* _target = nullptr;
-	// ÓÅÏÈ¹¥»÷µÄ½¨ÖşÖÖÀà
+	// ä¼˜å…ˆæ”»å‡»çš„å»ºç­‘ç§ç±»
 	BuildingType _priority = BUILDING_NORMAL;
-	// Ä¿±ê×ø±ê
+	// ç›®æ ‡åæ ‡
 	cocos2d::Vec2 _targetPosition = cocos2d::Vec2::ZERO;
-	// ¹¥»÷Ê±¼ä¼ä¸ô
+	// æ”»å‡»æ—¶é—´é—´éš”
 	float _attackTimer = 0.0f;
 	float _runTimer = 0.6f;
 
-	// ´«ÈëµÄºÏ·¨½¨Öş¼¯ºÏ
+	// ä¼ å…¥çš„åˆæ³•å»ºç­‘é›†åˆ
 	std::vector<Building*> _availableBuildings;
 
-	// ÒÆ¶¯¡¢¹¥»÷¡¢ËÀÍöÖ¡¼¯ºÏ
+	// ç§»åŠ¨ã€æ”»å‡»ã€æ­»äº¡å¸§é›†åˆ
 	cocos2d::Vector<cocos2d::SpriteFrame*> _runFrames;
 	cocos2d::Vector<cocos2d::SpriteFrame*> _attackFrames;
 	cocos2d::Vector<cocos2d::SpriteFrame*> _dieFrames;

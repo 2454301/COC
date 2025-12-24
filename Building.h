@@ -1,4 +1,4 @@
-#ifndef __BUILDING_H__
+ï»¿#ifndef __BUILDING_H__
 #define __BUILDING_H__
 
 #include "GameObject.h"
@@ -7,39 +7,42 @@ class Soldier;
 
 class Building : public GameObject {
 public:
-	// ½¨ÖşµÄ´´½¨
+	// å»ºç­‘çš„åˆ›å»º
 	static Building* createTownHall();
 	static Building* createCannon();
 	static Building* createGoldMine();
 	static Building* createElixirCollector();
-	static Building* createArmyCamp(); // ÑµÁ·Óª
-	static Building* createBarracks(); // ±øÓª
+	static Building* createArmyCamp(); // è®­ç»ƒè¥
+	static Building* createBarracks(); // å…µè¥
 
-	// ÉèÖÃ¹¥»÷Ä¿±ê
+	// è®¾ç½®æ”»å‡»ç›®æ ‡
 	void attack(GameObject* target);
-	// Í£Ö¹
+	// åœæ­¢
 	void stop();
 
+	int getSize() {
+		return _size;
+	}
 	BuildingType getType() {
 		return _type;
 	}
 
-	// ´«Èë±øÖÖ¼¯ºÏ
+	// ä¼ å…¥å…µç§é›†åˆ
 	void setSoldiers(const std::vector<Soldier*>& soldiers) {
 		_availableSoldiers = soldiers;
 	}
 
-	// Ñ°ÕÒµÚÒ»¸ö½øÈë·¶Î§µÄ±øÖÖ
+	// å¯»æ‰¾ç¬¬ä¸€ä¸ªè¿›å…¥èŒƒå›´çš„å…µç§
 	GameObject* findFirstSoldier();
 
-	// ĞĞÎª¸üĞÂÏµÍ³
+	// è¡Œä¸ºæ›´æ–°ç³»ç»Ÿ
 	void updateBehavior(float dt) override;
-	// ÊÜ¹¥»÷ºÍ±»´İ»Ù
+	// å—æ”»å‡»å’Œè¢«æ‘§æ¯
 	void onHit(float damage) override;
 	void onDestroy() override;
 
 private:
-	// ³õÊ¼»¯
+	// åˆå§‹åŒ–
 	bool initTownHall();
 	bool initCannon();
 	bool initGoldMine();
@@ -48,27 +51,25 @@ private:
 	bool initBarracks();
 
 
-	// µÈ¼¶
+	// ç­‰çº§
 	int _level = 1;
-	// ¹¥»÷Á¦
+	// å°ºå¯¸
+	int _size = 0;
+	// æ”»å‡»åŠ›
 	float _attack = 0.0f;
-	// ¹¥»÷·¶Î§
+	// æ”»å‡»èŒƒå›´
 	float _range = 0.0f;
-	// ½¨ÖşÖÖÀà
+	// å»ºç­‘ç§ç±»
 	BuildingType _type = BUILDING_NORMAL;
-	// ×ÊÔ´Àà½¨ÖşÉú²úĞ§ÂÊ
-	float _resourceProduction = 0.0f;
-	// ½¨ÔìÏûºÄ×ÊÔ´
-	float _resourceCost = 0.0f;
 
-	// ÅĞ¶ÏÊÇ·ñÔÚ¹¥»÷
+	// åˆ¤æ–­æ˜¯å¦åœ¨æ”»å‡»
 	bool _isAttacking = false;
-	// ¹¥»÷Ä¿±ê
+	// æ”»å‡»ç›®æ ‡
 	GameObject* _target = nullptr;
-	// ¹¥»÷Ê±¼ä¼ä¸ô
+	// æ”»å‡»æ—¶é—´é—´éš”
 	float _attackTimer = 0.0f;
 
-	// ´«ÈëµÄºÏ·¨±øÖÖ¼¯ºÏ
+	// ä¼ å…¥çš„åˆæ³•å…µç§é›†åˆ
 	std::vector<Soldier*> _availableSoldiers;
 };
 

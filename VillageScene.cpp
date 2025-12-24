@@ -1,19 +1,19 @@
-#include "VillageScene.h"
+ï»¿#include "VillageScene.h"
 #include "Soldier.h"
 #include "Building.h"
 #include "GameScene.h"
 
 USING_NS_CC;
 
-// ÀàÉùÃ÷
+// ç±»å£°æ˜
 class DraggableBuildings;
 
-// ´´½¨³¡¾°
+// åˆ›å»ºåœºæ™¯
 Scene* Village::createScene() {
 	return Village::create();
 }
 
-// ¶ÔÖ÷´å×¯³õÊ¼»¯
+// å¯¹ä¸»æ‘åº„åˆå§‹åŒ–
 bool Village::init() {
 	if (!Scene::init()) {
 		return false;
@@ -23,49 +23,66 @@ bool Village::init() {
 	float x = visibleSize.width;
 	float y = visibleSize.height;
 
-	// ¼ÓÔØµØÍ¼
+	// åŠ è½½åœ°å›¾
 	auto map = TMXTiledMap::create("COCmap1.tmx");
 	map->setAnchorPoint(Vec2::ZERO);
 	map->setPosition(Vec2::ZERO);
 	this->addChild(map, -2);
 
-	// ´´½¨¸ßÁÁ»æÖÆµÄDrawNode
+	// åˆ›å»ºé«˜äº®ç»˜åˆ¶çš„DrawNode
 	_buildingOutlineDrawNode = DrawNode::create();
-	this->addChild(_buildingOutlineDrawNode, 10); // ½Ï¸ßµÄz-order£¬È·±£ÔÚ½¨ÖşÉÏ·½
+	this->addChild(_buildingOutlineDrawNode, 10); // è¾ƒé«˜çš„z-orderï¼Œç¡®ä¿åœ¨å»ºç­‘ä¸Šæ–¹
 	_gridAreaDrawNode = DrawNode::create();
-	this->addChild(_gridAreaDrawNode, 9); // ÉÔµÍµÄz-order£¬ÔÚ½¨Öş±ß¿òÏÂ·½
+	this->addChild(_gridAreaDrawNode, 9); // ç¨ä½çš„z-orderï¼Œåœ¨å»ºç­‘è¾¹æ¡†ä¸‹æ–¹
 
-	// ³õÊ¼Ê±Òş²Ø¸ßÁÁ
+	// åˆå§‹æ—¶éšè—é«˜äº®
 	_buildingOutlineDrawNode->setVisible(false);
 	_gridAreaDrawNode->setVisible(false);
 
-	// ·ÅÖÃ½ğ±ÒºÍÊ¥Ë®ÊıÁ¿µÄ±êÇ©
-	_goldLabel = Label::createWithTTF("Gold: 1000", "fonts/Marker Felt.ttf", 24);
+	// æ”¾ç½®é‡‘å¸å’Œåœ£æ°´æ•°é‡çš„æ ‡ç­¾
+	_goldLabel = Label::createWithTTF("Gold: 1000 / 3000", "fonts/Marker Felt.ttf", 24);
 	_goldLabel->setPosition(Vec2(x / 2, y - 16));
 	this->addChild(_goldLabel, 11);
-	_elixirLabel = Label::createWithTTF("Elixir: 1000", "fonts/Marker Felt.ttf", 24);
+	_elixirLabel = Label::createWithTTF("Elixir: 1000 / 3000", "fonts/Marker Felt.ttf", 24);
 	_elixirLabel->setPosition(Vec2(x / 2, y - 48));
 	this->addChild(_elixirLabel);
 
-	// ·ÅÖÃ½¨Öş´ó±¾Óª
+	// æ”¾ç½®å…µç§æ•°é‡çš„æ ‡ç­¾
+	_barbarianLabel = Label::createWithTTF("Barbarian: 0", "fonts/Marker Felt.ttf", 24);
+	_barbarianLabel->setPosition(Vec2(96, y - 16));
+	this->addChild(_barbarianLabel, 11);
+	_archerLabel = Label::createWithTTF("Archer: 0", "fonts/Marker Felt.ttf", 24);
+	_archerLabel->setPosition(Vec2(96, y - 48));
+	this->addChild(_archerLabel, 11);
+	_giantLabel = Label::createWithTTF("Giant: 0", "fonts/Marker Felt.ttf", 24);
+	_giantLabel->setPosition(Vec2(96, y - 80));
+	this->addChild(_giantLabel, 11);
+	_goblinLabel = Label::createWithTTF("Goblin: 0", "fonts/Marker Felt.ttf", 24);
+	_goblinLabel->setPosition(Vec2(96, y - 112));
+	this->addChild(_goblinLabel, 11);
+	_troopLabel = Label::createWithTTF("All Soldier: 0 / 20", "fonts/Marker Felt.ttf", 24);
+	_troopLabel->setPosition(Vec2(96, y - 144));
+	this->addChild(_troopLabel, 11);
+
+	// æ”¾ç½®å»ºç­‘å¤§æœ¬è¥
 	auto townHall = DraggableBuildings::create("COCTown Hall.png");
-	townHall->setPosition(Vec2(1024, 576));
+	townHall->setPosition(Vec2(1120, 576));
 	townHall->setAnchorPoint(Vec2(0, 0));
 	townHall->setSize(96);
 	townHall->setVillage(this);
 	townHall->setBuildingType(DraggableBuildings::TOWN_HALL);
 	addBuilding(townHall);
 
-	// ·ÅÖÃ½¨Öş¼ÓÅ©ÅÚ
+	// æ”¾ç½®å»ºç­‘åŠ å†œç‚®
 	auto cannon = DraggableBuildings::create("COCCannon.png");
-	cannon->setPosition(Vec2(1024, 672));
+	cannon->setPosition(Vec2(1120, 672));
 	cannon->setAnchorPoint(Vec2(0, 0));
 	cannon->setSize(64);
 	cannon->setVillage(this);
 	cannon->setBuildingType(DraggableBuildings::CANNON);
 	addBuilding(cannon);
 
-	// ·ÅÖÃ½¨Öş½ğ¿ó
+	// æ”¾ç½®å»ºç­‘é‡‘çŸ¿
 	auto goldMine = DraggableBuildings::create("COCGold MIne.png");
 	goldMine->setPosition(Vec2(928, 640));
 	goldMine->setAnchorPoint(Vec2(0, 0));
@@ -74,7 +91,7 @@ bool Village::init() {
 	goldMine->setBuildingType(DraggableBuildings::GOLD_MINE);
 	addBuilding(goldMine);
 
-	// ·ÅÖÃ½¨ÖşÊ¥Ë®ÊÕ¼¯Æ÷
+	// æ”¾ç½®å»ºç­‘åœ£æ°´æ”¶é›†å™¨
 	auto elixirCollector = DraggableBuildings::create("COCElixir Collector.png");
 	elixirCollector->setPosition(Vec2(928, 576));
 	elixirCollector->setAnchorPoint(Vec2(0, 0));
@@ -83,9 +100,9 @@ bool Village::init() {
 	elixirCollector->setBuildingType(DraggableBuildings::ELIXIR_COLLECTOR);
 	addBuilding(elixirCollector);
 
-	// ·ÅÖÃ½¨ÖşÑµÁ·Óª
+	// æ”¾ç½®å»ºç­‘è®­ç»ƒè¥
 	auto armyCamp = DraggableBuildings::create("ArmyCamp.png");
-	armyCamp->setPosition(Vec2(1024, 480));
+	armyCamp->setPosition(Vec2(1120, 480));
 	armyCamp->setScale(0.32);
 	armyCamp->setAnchorPoint(Vec2(0, 0));
 	armyCamp->setSize(32);
@@ -93,7 +110,34 @@ bool Village::init() {
 	armyCamp->setBuildingType(DraggableBuildings::ARMY_CAMP);
 	addBuilding(armyCamp);
 
-	// ¹Ø¿¨ÏµÍ³£ºÒ»¸öµã»÷ºó¿ÉÑ¡Ôñ¹Ø¿¨µÄ°´Å¥¡¢Èı¸ö¹Ø¿¨½øÈë°´Å¥
+	// æ”¾ç½®å»ºç­‘å…µè¥
+	auto barracks = DraggableBuildings::create("COCBarracks.png");
+	barracks->setPosition(Vec2(928, 480));
+	barracks->setAnchorPoint(Vec2(0, 0));
+	barracks->setSize(96);
+	barracks->setVillage(this);
+	barracks->setBuildingType(DraggableBuildings::BARRACKS);
+	addBuilding(barracks);
+
+	// æ”¾ç½®å»ºç­‘å‚¨é‡‘ç½
+	auto goldStorage = DraggableBuildings::create("COCGold Storage.png");
+	goldStorage->setPosition(Vec2(768, 320));
+	goldStorage->setAnchorPoint(Vec2(0, 0));
+	goldStorage->setSize(64);
+	goldStorage->setVillage(this);
+	goldStorage->setBuildingType(DraggableBuildings::GOLD_STORAGE);
+	addBuilding(goldStorage);
+
+	// æ”¾ç½®å»ºç­‘åœ£æ°´ç“¶
+	auto elixirStorage = DraggableBuildings::create("COCElixir Storage.png");
+	elixirStorage->setPosition(Vec2(1120, 320));
+	elixirStorage->setAnchorPoint(Vec2(0, 0));
+	elixirStorage->setSize(64);
+	elixirStorage->setVillage(this);
+	elixirStorage->setBuildingType(DraggableBuildings::ELIXIR_STORAGE);
+	addBuilding(elixirStorage);
+
+	// å…³å¡ç³»ç»Ÿï¼šä¸€ä¸ªç‚¹å‡»åå¯é€‰æ‹©å…³å¡çš„æŒ‰é’®ã€ä¸‰ä¸ªå…³å¡è¿›å…¥æŒ‰é’®
 	levelItem = MenuItemImage::create("Level.png", "Level.png", CC_CALLBACK_1(Village::levelCallBack, this));
 	levelItem_1= MenuItemImage::create("Level_1.png", "Level_1.png", CC_CALLBACK_1(Village::levelCallBack_1, this));
 	levelItem_2 = MenuItemImage::create("Level_2.png", "Level_2.png", CC_CALLBACK_1(Village::levelCallBack_2, this));
@@ -109,29 +153,29 @@ bool Village::init() {
 	return true;
 }
 
-// ÏÔÊ¾ËùÓĞ½¨Öş±ß¿ò¸ßÁÁ
+// æ˜¾ç¤ºæ‰€æœ‰å»ºç­‘è¾¹æ¡†é«˜äº®
 void Village::showBuildingOutlines() {
 	_buildingOutlineDrawNode->clear();
 	_buildingOutlineDrawNode->setVisible(true);
 
-	// ÉèÖÃ±ß¿òÑÕÉ«ÎªÂÌÉ«
+	// è®¾ç½®è¾¹æ¡†é¢œè‰²ä¸ºç»¿è‰²
 	Color4F outlineColor(0.0f, 1.0f, 0.0f, 0.8f);
 	float lineWidth = 2.0f;
 
-	// ±éÀúËùÓĞ½¨Öş£¬»æÖÆ±ß¿ò
+	// éå†æ‰€æœ‰å»ºç­‘ï¼Œç»˜åˆ¶è¾¹æ¡†
 	for (auto building : _myBuildings) {
 		if (building) {
-			// »ñÈ¡½¨ÖşÔÚÊÀ½ç×ø±êÏµÖĞµÄ±ß½ç¿ò
+			// è·å–å»ºç­‘åœ¨ä¸–ç•Œåæ ‡ç³»ä¸­çš„è¾¹ç•Œæ¡†
 			Rect rect = building->getBoundingBox();
 
-			// ½«ÊÀ½ç×ø±ê×ª»»ÎªDrawNodeµÄ±¾µØ×ø±ê
-			// ÒòÎª DrawNode ÊÇÖ±½ÓÌí¼Óµ½³¡¾°ÖĞµÄ£¬ËùÒÔĞèÒª½«ÊÀ½ç×ø±ê×ª»»Îª³¡¾°×ø±ê
+			// å°†ä¸–ç•Œåæ ‡è½¬æ¢ä¸ºDrawNodeçš„æœ¬åœ°åæ ‡
+			// å› ä¸º DrawNode æ˜¯ç›´æ¥æ·»åŠ åˆ°åœºæ™¯ä¸­çš„ï¼Œæ‰€ä»¥éœ€è¦å°†ä¸–ç•Œåæ ‡è½¬æ¢ä¸ºåœºæ™¯åæ ‡
 			Vec2 bottomLeft = this->convertToNodeSpace(rect.origin);
 			Vec2 bottomRight = this->convertToNodeSpace(Vec2(rect.getMaxX(), rect.getMinY()));
 			Vec2 topRight = this->convertToNodeSpace(Vec2(rect.getMaxX(), rect.getMaxY()));
 			Vec2 topLeft = this->convertToNodeSpace(Vec2(rect.getMinX(), rect.getMaxY()));
 
-			// »æÖÆ¾ØĞÎ±ß¿ò
+			// ç»˜åˆ¶çŸ©å½¢è¾¹æ¡†
 			_buildingOutlineDrawNode->drawLine(bottomLeft, bottomRight, outlineColor);
 			_buildingOutlineDrawNode->drawLine(bottomRight, topRight, outlineColor);
 			_buildingOutlineDrawNode->drawLine(topRight, topLeft, outlineColor);
@@ -140,20 +184,20 @@ void Village::showBuildingOutlines() {
 	}
 }
 
-// Òş²Ø½¨Öş±ß¿ò¸ßÁÁ
+// éšè—å»ºç­‘è¾¹æ¡†é«˜äº®
 void Village::hideBuildingOutlines() {
 	_buildingOutlineDrawNode->setVisible(false);
 }
 
-// ÏÔÊ¾Íø¸ñÇøÓò¸ßÁÁ
+// æ˜¾ç¤ºç½‘æ ¼åŒºåŸŸé«˜äº®
 void Village::showGridArea() {
 	_gridAreaDrawNode->clear();
 	_gridAreaDrawNode->setVisible(true);
 
-	// ÉèÖÃÍø¸ñÇøÓòÑÕÉ«ÎªÀ¶É«
+	// è®¾ç½®ç½‘æ ¼åŒºåŸŸé¢œè‰²ä¸ºè“è‰²
 	Color4F gridColor(0.0f, 0.0f, 1.0f, 0.6f);
 
-	// ¶¨Òå¾ØĞÎ·¶Î§µÄËÄ¸ö¶¥µã
+	// å®šä¹‰çŸ©å½¢èŒƒå›´çš„å››ä¸ªé¡¶ç‚¹
 	Vec2 vertices[4] = {
 		Vec2(640, 192),
 		Vec2(640, 800),
@@ -161,39 +205,58 @@ void Village::showGridArea() {
 		Vec2(1408, 192)
 	};
 
-	// »æÖÆ¾ØĞÎ±ß¿ò
+	// ç»˜åˆ¶çŸ©å½¢è¾¹æ¡†
 	for (int i = 0; i < 4; i++) {
 		_gridAreaDrawNode->drawLine(vertices[i], vertices[(i + 1) % 4], gridColor);
 	}
 
-	// Ìî³ä¾ØĞÎÄÚ²¿£¨°ëÍ¸Ã÷£©
+	// å¡«å……çŸ©å½¢å†…éƒ¨ï¼ˆåŠé€æ˜ï¼‰
 	_gridAreaDrawNode->drawSolidRect(vertices[0], vertices[2], Color4F(0.0f, 0.0f, 1.0f, 0.2f));
 }
 
-// Òş²ØÍø¸ñÇøÓò¸ßÁÁ
+// éšè—ç½‘æ ¼åŒºåŸŸé«˜äº®
 void Village::hideGridArea() {
 	_gridAreaDrawNode->setVisible(false);
 }
 
-// ¸üĞÂ×ÊÔ´ÊıÁ¿±êÇ©
+// æ›´æ–°èµ„æºæ•°é‡æ ‡ç­¾
 void Village::updateResourceLabels() {
-	_goldLabel->setString(StringUtils::format("Gold: %d", (int)_gold));
-	_elixirLabel->setString(StringUtils::format("Elixir: %d", (int)_elixir));
+	_goldLabel->setString(StringUtils::format("Gold: %d / %d", (int)_gold, (int)_maxGold));
+	_elixirLabel->setString(StringUtils::format("Elixir: %d / %d", (int)_elixir, (int)_maxElixir));
 }
 
-// ½ğ±ÒÔö¼Ó
+// æ›´æ–°å…µç§æ•°é‡æ ‡ç­¾
+void Village::updateTroopLabels() {
+	_barbarianLabel->setString(StringUtils::format("Barbarian: %d", _numOfBarbarians));
+	_archerLabel->setString(StringUtils::format("Archer: %d", _numOfArchers));
+	_giantLabel->setString(StringUtils::format("Giant: %d", _numOfGiants));
+	_goblinLabel->setString(StringUtils::format("Goblin: %d", _numOfGoblins));
+	_troopLabel->setString(StringUtils::format("All Soldier: %d / %d", _numOfBarbarians + _numOfArchers + _numOfGiants + _numOfGoblins, _maxSoldier));
+}
+
+// é‡‘å¸å¢åŠ 
 void Village::addGold(float gold) {
-	_gold += gold;
+	if (_maxGold - _gold < gold) {
+		_gold = _maxGold;
+	}
+	else {
+		_gold += gold;
+	}
 	updateResourceLabels();
 }
 
-// Ê¥Ë®Ôö¼Ó
+// åœ£æ°´å¢åŠ 
 void Village::addElixir(float elixir) {
-	_elixir += elixir;
+	if (_maxElixir - _elixir < elixir) {
+		_elixir = _maxElixir;
+	}
+	else {
+		_elixir += elixir;
+	}
 	updateResourceLabels();
 }
 
-// ½ğ±Ò¼õÉÙ
+// é‡‘å¸å‡å°‘
 void Village::reduceGold(float gold) {
 	if (!goldIsEnough(gold)) {
 		return;
@@ -203,7 +266,7 @@ void Village::reduceGold(float gold) {
 	updateResourceLabels();
 }
 
-// Ê¥Ë®¼õÉÙ
+// åœ£æ°´å‡å°‘
 void Village::reduceElixir(float elixir) {
 	if (!elixirIsEnough(elixir)) {
 		return;
@@ -213,37 +276,37 @@ void Village::reduceElixir(float elixir) {
 	updateResourceLabels();
 }
 
-// ÅĞ¶Ï½ğ±ÒÊÇ·ñ×ã¹»
+// åˆ¤æ–­é‡‘å¸æ˜¯å¦è¶³å¤Ÿ
 bool Village::goldIsEnough(float gold) {
 	return _gold >= gold;
 }
 
-// ÅĞ¶ÏÊ¥Ë®ÊÇ·ñ×ã¹»
+// åˆ¤æ–­åœ£æ°´æ˜¯å¦è¶³å¤Ÿ
 bool Village::elixirIsEnough(float elixir) {
 	return _elixir >= elixir;
 }
 
-// °´ÕÕÂß¼­Ìí¼Ó½¨Öş
+// æŒ‰ç…§é€»è¾‘æ·»åŠ å»ºç­‘
 void Village::addBuilding(DraggableBuildings* building) {
 	if (building) {
-		_myBuildings.push_back(building); // °Ñ½¨Öş·Åµ½¼¯ºÏÖĞ
-		this->addChild(building); // ÔÚ³¡¾°ÖĞÏÔÊ¾½¨Öş
+		_myBuildings.push_back(building); // æŠŠå»ºç­‘æ”¾åˆ°é›†åˆä¸­
+		this->addChild(building); // åœ¨åœºæ™¯ä¸­æ˜¾ç¤ºå»ºç­‘
 	}
 }
 
-// ÅĞ¶Ï½¨ÖşÊÇ·ñÖØµş
+// åˆ¤æ–­å»ºç­‘æ˜¯å¦é‡å 
 bool Village::isTouching(DraggableBuildings* pointBuilding) {
-	for (auto building : _myBuildings) { // ±éÀú¼¯ºÏÖĞµÄËùÓĞ½¨Öş
-		if (building == pointBuilding) { // Èç¹û½¨ÖşÊÇ×ÔÉí¾ÍÌø¹ı
+	for (auto building : _myBuildings) { // éå†é›†åˆä¸­çš„æ‰€æœ‰å»ºç­‘
+		if (building == pointBuilding) { // å¦‚æœå»ºç­‘æ˜¯è‡ªèº«å°±è·³è¿‡
 			continue;
 		}
 
-		// »ñÈ¡Á½¸ö½¨ÖşµÄ±ß½ç¿ò
+		// è·å–ä¸¤ä¸ªå»ºç­‘çš„è¾¹ç•Œæ¡†
 		Rect rect1 = pointBuilding->getBoundingBox();
 		Rect rect2 = building->getBoundingBox();
 
-		// ÊÕËõ±ß½ç¿ò£¬ÔÊĞí±ß½çÖØµş
-		float shrinkAmount = 2.0f; // ÊÕËõÁ¿£¬2ÏñËØ¶ÔÓÚ¸ñ×ÓµÄ32ÏñËØÎŞÓ°Ïì
+		// æ”¶ç¼©è¾¹ç•Œæ¡†ï¼Œå…è®¸è¾¹ç•Œé‡å 
+		float shrinkAmount = 2.0f; // æ”¶ç¼©é‡ï¼Œ2åƒç´ å¯¹äºæ ¼å­çš„32åƒç´ æ— å½±å“
 		rect1.origin.x += shrinkAmount;
 		rect1.origin.y += shrinkAmount;
 		rect1.size.width -= 2 * shrinkAmount;
@@ -254,7 +317,7 @@ bool Village::isTouching(DraggableBuildings* pointBuilding) {
 		rect2.size.height -= 2 * shrinkAmount;
 		rect2.size.width -= 2 * shrinkAmount;
 
-		// Ê¹ÓÃÊÕËõºóµÄ¾ØĞÎ¼ì²âÖØµş
+		// ä½¿ç”¨æ”¶ç¼©åçš„çŸ©å½¢æ£€æµ‹é‡å 
 		if (rect1.intersectsRect(rect2)) {
 			return true;
 		}
@@ -262,7 +325,7 @@ bool Village::isTouching(DraggableBuildings* pointBuilding) {
 	return false;
 }
 
-// Ö÷´å×¯ÖĞ½¨ÖşµÄ´´½¨
+// ä¸»æ‘åº„ä¸­å»ºç­‘çš„åˆ›å»º
 DraggableBuildings* DraggableBuildings::create(const std::string& filename)
 {
 	DraggableBuildings* sprite = new (std::nothrow) DraggableBuildings();
@@ -275,7 +338,7 @@ DraggableBuildings* DraggableBuildings::create(const std::string& filename)
 	return nullptr;
 }
 
-// Ö÷´å×¯ÖĞ½¨ÖşµÄ³õÊ¼»¯
+// ä¸»æ‘åº„ä¸­å»ºç­‘çš„åˆå§‹åŒ–
 bool DraggableBuildings::init(const std::string& filename)
 {
 	if (!Sprite::initWithFile(filename))
@@ -290,12 +353,12 @@ bool DraggableBuildings::init(const std::string& filename)
 	return true;
 }
 
-// È·±£DraggableBuildingsÀà¿ÉÒÔÍ¨¹ı_villageÀ´·ÃÎÊµ½VillageÀà
+// ç¡®ä¿DraggableBuildingsç±»å¯ä»¥é€šè¿‡_villageæ¥è®¿é—®åˆ°Villageç±»
 void DraggableBuildings::setVillage(Village* village) {
 	_village = village;
 }
 
-// ¸³Óè½¨Öş¡°¿ÉÍÏ¶¯¡±µÄĞÔÖÊ
+// èµ‹äºˆå»ºç­‘â€œå¯æ‹–åŠ¨â€çš„æ€§è´¨
 void DraggableBuildings::setDraggable(bool draggable)
 {
 	auto eventDispatcher = Director::getInstance()->getEventDispatcher();
@@ -317,7 +380,7 @@ void DraggableBuildings::setDraggable(bool draggable)
 	}
 }
 
-// ¼ÇÂ¼µã»÷ÔÚÄ³¸ö½¨ÖşµÄ¿ªÊ¼Ë²¼ä
+// è®°å½•ç‚¹å‡»åœ¨æŸä¸ªå»ºç­‘çš„å¼€å§‹ç¬é—´
 bool DraggableBuildings::onTouchBegan(Touch* touch, Event* event)
 {
 	_originalPos = this->getPosition();
@@ -333,18 +396,13 @@ bool DraggableBuildings::onTouchBegan(Touch* touch, Event* event)
 
 		_touchBeganPos = touch->getLocation();
 
-		if (_village) {
-			_village->showBuildingOutlines(); // ÏÔÊ¾½¨Öş±ß¿ò¸ßÁÁ
-			_village->showGridArea(); // ÏÔÊ¾Íø¸ñÇøÓò¸ßÁÁ
-		}
-
 		return true;
 	}
 
 	return false;
 }
 
-// Êó±êÒÆ¶¯¿ÉÒÔ´ø¶¯½¨ÖşÒ»ÆğÒÆ¶¯£¬ÊµÏÖ¡°¿ÉÍÏ¶¯¡±
+// é¼ æ ‡ç§»åŠ¨å¯ä»¥å¸¦åŠ¨å»ºç­‘ä¸€èµ·ç§»åŠ¨ï¼Œå®ç°â€œå¯æ‹–åŠ¨â€
 void DraggableBuildings::onTouchMoved(Touch* touch, Event* event)
 {
 	if (_isDragging)
@@ -355,13 +413,15 @@ void DraggableBuildings::onTouchMoved(Touch* touch, Event* event)
 		_hasMoved = true;
 
 		if (_village) {
-			_village->showBuildingOutlines();  // ¸üĞÂ½¨Öş±ß¿ò
-			_village->showGridArea(); // ¸üĞÂÍø¸ñÇøÓò
+			_village->showBuildingOutlines(); // æ˜¾ç¤ºå»ºç­‘è¾¹æ¡†é«˜äº®
+			_village->showGridArea(); // æ˜¾ç¤ºç½‘æ ¼åŒºåŸŸé«˜äº®
+			_village->showBuildingOutlines();  // æ›´æ–°å»ºç­‘è¾¹æ¡†
+			_village->showGridArea(); // æ›´æ–°ç½‘æ ¼åŒºåŸŸ
 		}
 	}
 }
 
-// µã»÷½áÊø£¬¸ù¾İ²»Í¬Çé¿ö×÷³ö´¦Àí
+// ç‚¹å‡»ç»“æŸï¼Œæ ¹æ®ä¸åŒæƒ…å†µä½œå‡ºå¤„ç†
 void DraggableBuildings::onTouchEnded(Touch* touch, Event* event)
 {
 	if (_isDragging)
@@ -370,8 +430,8 @@ void DraggableBuildings::onTouchEnded(Touch* touch, Event* event)
 
 		Vec2 touchEndedPos = touch->getLocation();
 		float moveDistance = _touchBeganPos.distance(touchEndedPos);
-		if (moveDistance <= 10.0f && !_hasMoved) { // Èç¹ûÒÆ¶¯ºÜĞ¡£¨ÊÓ×÷µã»÷¶ø·ÇÍÏ¶¯£©
-			onBuildingClicked(); // Ôò´¥·¢µã»÷¶ÔÓ¦µÄ»Øµ÷º¯Êı
+		if (moveDistance <= 10.0f && !_hasMoved) { // å¦‚æœç§»åŠ¨å¾ˆå°ï¼ˆè§†ä½œç‚¹å‡»è€Œéæ‹–åŠ¨ï¼‰
+			onBuildingClicked(); // åˆ™è§¦å‘ç‚¹å‡»å¯¹åº”çš„å›è°ƒå‡½æ•°
 
 			if (_village) {
 				_village->hideBuildingOutlines();
@@ -385,7 +445,7 @@ void DraggableBuildings::onTouchEnded(Touch* touch, Event* event)
 		hideInfoPanel();
 	}
 
-	// ·ñÔò´¥·¢ÒÔÏÂµÄÎ»ÖÃµ÷ÕûÂß¼­
+	// å¦åˆ™è§¦å‘ä»¥ä¸‹çš„ä½ç½®è°ƒæ•´é€»è¾‘
 	Vec2 bestPos;
 	float distance = FLT_MAX;
 
@@ -401,14 +461,14 @@ void DraggableBuildings::onTouchEnded(Touch* touch, Event* event)
 			}
 		}
 	}
-	this->setPosition(bestPos); // ÕâÑù½¨Öş¾Í»á×Ô¶¯Îü¸½Íø¸ñ£¬¶ø²»ÊÇËæÒâ°Ú·Å
+	this->setPosition(bestPos); // è¿™æ ·å»ºç­‘å°±ä¼šè‡ªåŠ¨å¸é™„ç½‘æ ¼ï¼Œè€Œä¸æ˜¯éšæ„æ‘†æ”¾
 
 	bool isOverlapping = false;
 	if (_village) {
-		isOverlapping = _village->isTouching(this); // Èç¹ûºÍÆäËû½¨ÖşÖØµş
+		isOverlapping = _village->isTouching(this); // å¦‚æœå’Œå…¶ä»–å»ºç­‘é‡å 
 	}
 	if (isOverlapping) {
-		this->setPosition(_originalPos); // ¾Í°Ñ¸Ã½¨Öş·Å»ØÔ­Î»ÖÃ£¬±íÊ¾ÒÆ¶¯Ê§°Ü
+		this->setPosition(_originalPos); // å°±æŠŠè¯¥å»ºç­‘æ”¾å›åŸä½ç½®ï¼Œè¡¨ç¤ºç§»åŠ¨å¤±è´¥
 	}
 
 	if (_village) {
@@ -417,17 +477,32 @@ void DraggableBuildings::onTouchEnded(Touch* touch, Event* event)
 	}
 }
 
-// Éı¼¶Âß¼­
+// å‡çº§é€»è¾‘
 void DraggableBuildings::upgrade() {
 	if (_village) {
-		if (_level < 3 && _village->goldIsEnough(200 * _level)) { // ×î¸ß3¼¶£¬ÇÒÃ¿´ÎÉı¼¶ÏûºÄ200*µÈ¼¶½ğ±Ò
+		if (_level < 3 && _village->goldIsEnough(200 * _level)) { // æœ€é«˜3çº§ï¼Œä¸”æ¯æ¬¡å‡çº§æ¶ˆè€—200*ç­‰çº§é‡‘å¸
 			_village->reduceGold(200 * _level);
 			_level++;
+
+			switch (this->_buildingType) {
+			case GOLD_STORAGE:
+				_village->promoteGoldVolume();
+				break;
+
+			case ELIXIR_STORAGE:
+				_village->promoteElixirVolume();
+
+			case BARRACKS:
+				_village->promoteSoldierVolume();
+			}
+
+			_village->updateResourceLabels();
+			_village->updateTroopLabels();
 		}
 	}
 }
 
-// µã»÷½¨ÖşºóµÄ»Øµ÷º¯Êı
+// ç‚¹å‡»å»ºç­‘åçš„å›è°ƒå‡½æ•°
 void DraggableBuildings::onBuildingClicked() {
 	if (_infoPanelVisible) {
 		hideInfoPanel();
@@ -437,7 +512,7 @@ void DraggableBuildings::onBuildingClicked() {
 	}
 }
 
-// ³õÊ¼»¯½¨ÖşÏà¹Ø²Ëµ¥
+// åˆå§‹åŒ–å»ºç­‘ç›¸å…³èœå•
 void DraggableBuildings::initInfoPanel() {
 	_levelLabel = Label::createWithTTF("Lv.1", "fonts/Marker Felt.ttf", 18);
 	_levelLabel->setPosition(Vec2(-60, 10));
@@ -474,7 +549,7 @@ void DraggableBuildings::initInfoPanel() {
 	this->addChild(_infoMenu, 11);
 }
 
-// ÏÔÊ¾½¨ÖşÏà¹Ø²Ëµ¥
+// æ˜¾ç¤ºå»ºç­‘ç›¸å…³èœå•
 void DraggableBuildings::showInfoPanel() {
 	if (!_village) {
 		return;
@@ -487,7 +562,7 @@ void DraggableBuildings::showInfoPanel() {
 	_infoMenu->setVisible(true);
 	_upgradeButton->setVisible(true);
 	_infoPanelVisible = true;
-	// Éú²úÀà½¨ÖşÉèÖÃÊÕ¼¯°´Å¥Îª¿É¼û
+	// ç”Ÿäº§ç±»å»ºç­‘è®¾ç½®æ”¶é›†æŒ‰é’®ä¸ºå¯è§
 	if (_buildingType == GOLD_MINE || _buildingType == ELIXIR_COLLECTOR) {
 		_collectButton->setVisible(true);
 	}
@@ -495,7 +570,7 @@ void DraggableBuildings::showInfoPanel() {
 		_collectButton->setVisible(false);
 	}
 
-	// ÑµÁ·ÓªÉèÖÃÑµÁ·°´Å¥¿É¼û
+	// è®­ç»ƒè¥è®¾ç½®è®­ç»ƒæŒ‰é’®å¯è§
 	if (_buildingType == ARMY_CAMP) {
 		_trainBarbarianButton->setVisible(true);
 		_trainArcherButton->setVisible(true);
@@ -504,14 +579,14 @@ void DraggableBuildings::showInfoPanel() {
 	}
 }
 
-// Òş²Ø½¨ÖşÏà¹Ø²Ëµ¥
+// éšè—å»ºç­‘ç›¸å…³èœå•
 void DraggableBuildings::hideInfoPanel() {
 	_levelLabel->setVisible(false);
 	_infoMenu->setVisible(false);
 	_infoPanelVisible = false;
 }
 
-// Òş²ØÆäËû½¨ÖşÏà¹Ø²Ëµ¥
+// éšè—å…¶ä»–å»ºç­‘ç›¸å…³èœå•
 void DraggableBuildings::hideOtherBuildingPanels() {
 	if (!_village) {
 		return;
@@ -524,91 +599,99 @@ void DraggableBuildings::hideOtherBuildingPanels() {
 	}
 }
 
-// ¸üĞÂ½¨ÖşÏà¹Ø²Ëµ¥
+// æ›´æ–°å»ºç­‘ç›¸å…³èœå•
 void DraggableBuildings::updateInfoPanel() {
-	// ¸üĞÂµÈ¼¶ÏÔÊ¾
+	// æ›´æ–°ç­‰çº§æ˜¾ç¤º
 	std::string levelText = "Lv." + std::to_string(_level);
 	_levelLabel->setString(levelText);
 }
 
-// Éı¼¶°´Å¥»Øµ÷º¯Êı
+// å‡çº§æŒ‰é’®å›è°ƒå‡½æ•°
 void DraggableBuildings::onUpgradeClicked(cocos2d::Ref* sender) {
 	upgrade();
 	updateInfoPanel();
 }
 
-// ÊÕ¼¯°´Å¥»Øµ÷º¯Êı
+// æ”¶é›†æŒ‰é’®å›è°ƒå‡½æ•°
 void DraggableBuildings::onCollectClicked(cocos2d::Ref* sender) {
 	if (!_village) {
 		return;
 	}
 
 	if (_buildingType == GOLD_MINE) {
-		// ÊÕ¼¯½ğ±Ò
+		// æ”¶é›†é‡‘å¸
 		_village->addGold(100 * this->_level);
 	}
 	else if (_buildingType == ELIXIR_COLLECTOR) {
-		// ÊÕ¼¯Ê¥Ë®
+		// æ”¶é›†åœ£æ°´
 		_village->addElixir(100 * this->_level);
 	}
 }
 
-// ÑµÁ·Ò°ÂùÈË
+// è®­ç»ƒé‡è›®äºº
 void DraggableBuildings::onTrainBarbarianClicked(cocos2d::Ref* sender) {
 	if (_village) {
-		if (_village->elixirIsEnough(50)) {
+		if (_village->elixirIsEnough(50) && !_village->soldierIsFull()) {
 			_village->reduceElixir(50);
 			_village->_numOfBarbarians++;
+
+			_village->updateTroopLabels();
 		}
 	}
 }
 
-// ÑµÁ·¹­¼ıÊÖ
+// è®­ç»ƒå¼“ç®­æ‰‹
 void DraggableBuildings::onTrainArcherClicked(cocos2d::Ref* sender) {
 	if (_village) {
-		if (_village->elixirIsEnough(50)) {
+		if (_village->elixirIsEnough(50) && !_village->soldierIsFull()) {
 			_village->reduceElixir(50);
 			_village->_numOfArchers++;
+
+			_village->updateTroopLabels();
 		}
 	}
 }
 
-// ÑµÁ·¾ŞÈË
+// è®­ç»ƒå·¨äºº
 void DraggableBuildings::onTrainGiantClicked(cocos2d::Ref* sender) {
 	if (_village) {
-		if (_village->elixirIsEnough(100)) {
+		if (_village->elixirIsEnough(100) && !_village->soldierIsFull()) {
 			_village->reduceElixir(100);
 			_village->_numOfGiants++;
+
+			_village->updateTroopLabels();
 		}
 	}
 }
 
-// ÑµÁ·¸ç²¼ÁÖ
+// è®­ç»ƒå“¥å¸ƒæ—
 void DraggableBuildings::onTrainGoblinClicked(cocos2d::Ref* sender) {
 	if (_village) {
-		if (_village->elixirIsEnough(50)) {
+		if (_village->elixirIsEnough(50) && !_village->soldierIsFull()) {
 			_village->reduceElixir(50);
 			_village->_numOfGoblins++;
+
+			_village->updateTroopLabels();
 		}
 	}
 }
 
-// ÒÔÏÂ¶¼ÊÇ¹Ø¿¨ÏµÍ³Ïà¹Ø»Øµ÷º¯Êı
+// ä»¥ä¸‹éƒ½æ˜¯å…³å¡ç³»ç»Ÿç›¸å…³å›è°ƒå‡½æ•°
 
 void Village::levelCallBack(Ref* psender) {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	float x = visibleSize.width;
 	float y = visibleSize.height;
 
-	static bool valid = true; // ¼ÇÂ¼µã»÷´ÎÊı
-	if (valid) { // ËµÃ÷¹Ø¿¨Ñ¡Ôñ°´Å¥»¹Î´³öÏÖ
-		// °Ñ¹Ø¿¨Ñ¡Ôñ°´Å¥·Å³öÀ´
+	static bool valid = true; // è®°å½•ç‚¹å‡»æ¬¡æ•°
+	if (valid) { // è¯´æ˜å…³å¡é€‰æ‹©æŒ‰é’®è¿˜æœªå‡ºç°
+		// æŠŠå…³å¡é€‰æ‹©æŒ‰é’®æ”¾å‡ºæ¥
 		levelItem_1->setPosition(Vec2(x - 96, y - 32));
 		levelItem_2->setPosition(Vec2(x - 160, y - 32));
 		levelItem_3->setPosition(Vec2(x - 224, y - 32));
 		valid = !valid;
 	}
-	else { // Ïà·´
+	else { // ç›¸å
 		levelItem_1->setPosition(Vec2(x - 96, y + 64));
 		levelItem_2->setPosition(Vec2(x - 160, y + 64));
 		levelItem_3->setPosition(Vec2(x - 224, y + 64));
@@ -617,26 +700,26 @@ void Village::levelCallBack(Ref* psender) {
 }
 
 void Village::levelCallBack_1(Ref* psender) {
-	// Î´ÑµÁ·±øÖÖ£¬½ûÖ¹½øÈë¹Ø¿¨
+	// æœªè®­ç»ƒå…µç§ï¼Œç¦æ­¢è¿›å…¥å…³å¡
 	if (_numOfBarbarians == 0 && _numOfArchers == 0 && _numOfGiants == 0 && _numOfGoblins == 0) {
 		return;
 	}
 
-	// ´´½¨¹Ø¿¨³¡¾°
+	// åˆ›å»ºå…³å¡åœºæ™¯
 	auto levelscene = Level_1::createScene();
 
-	// ¹ØÁª¹Ø¿¨³¡¾°ºÍÖ÷´å×¯³¡¾°
+	// å…³è”å…³å¡åœºæ™¯å’Œä¸»æ‘åº„åœºæ™¯
 	auto level = dynamic_cast<Level_1*>(levelscene);
 	if (level) {
-		level->setTroopCounts(_numOfBarbarians, _numOfArchers, _numOfGiants, _numOfGoblins); // ´«ÈëÑµÁ·µÄ±øÖÖ
-		level->setVillage(this); // ÈÃ¹Ø¿¨³¡¾°¿ÉÒÔ·ÃÎÊÖ÷´å×¯³¡¾°
+		level->setTroopCounts(_numOfBarbarians, _numOfArchers, _numOfGiants, _numOfGoblins); // ä¼ å…¥è®­ç»ƒçš„å…µç§
+		level->setVillage(this); // è®©å…³å¡åœºæ™¯å¯ä»¥è®¿é—®ä¸»æ‘åº„åœºæ™¯
 	}
 
-	Director::getInstance()->pushScene(levelscene); // ¹Ø¿¨³¡¾°½øÕ»
+	Director::getInstance()->pushScene(levelscene); // å…³å¡åœºæ™¯è¿›æ ˆ
 }
 
 void Village::levelCallBack_2(Ref* psender) {
-	// 2¡¢3¹ØÎ´Íê³É
+	// 2ã€3å…³æœªå®Œæˆ
 }
 
 void Village::levelCallBack_3(Ref* psender) {

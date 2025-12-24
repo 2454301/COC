@@ -1,9 +1,8 @@
-#ifndef  __GAME_OBJECT_H__
+ï»¿#ifndef  __GAME_OBJECT_H__
 #define  __GAME_OBJECT_H__
 
 #include "cocos2d.h"
 
-// ÕâÀïÊÇ±øÖÖÀàºÍ½¨ÖşÀàµÄ×Ü»ùÀà
 class GameObject : public cocos2d::Node {
 public:
 	CREATE_FUNC(GameObject);
@@ -14,7 +13,6 @@ public:
 		BUILDING_RESOURCE
 	};
 
-	// ³õÊ¼»¯
 	virtual bool init() override {
 		if (!Node::init()) {
 			return false;
@@ -22,45 +20,33 @@ public:
 		this->scheduleUpdate();
 		return true;
 	}
-	
-	// ¸üĞÂĞĞÎª
+
 	virtual void updateBehavior(float dt) {}
-	// ÊÜ¹¥»÷
 	virtual void onHit(float damage) {}
-	// ±»´İ»Ù
 	virtual void onDestroy() {
 		_isDestroyed = true;
 	}
 
-	// ÉèÖÃÑªÁ¿
 	void setHealth(float health) {
 		_health = health;
 	}
-	// »ñÈ¡ÑªÁ¿
 	float getHealth() {
 		return _health;
 	}
-	// ÅĞ¶Ï´æ»î
 	bool isAlive() {
 		return _health > 0 && !_isDestroyed;
 	}
-	// ÅĞ¶Ï´İ»Ù
 	bool isDestroyed() {
 		return _isDestroyed;
 	}
 
 protected:
-	// µ±Ç°ÑªÁ¿
 	float _health = 0.0f;
-	// ×î´óÑªÁ¿
 	float _maxHealth = 0.0f;
-	// ÅĞ¶ÏÊÇ·ñ±»´İ»Ù
 	bool _isDestroyed = false;
-	// Í¼Æ¬ÏÔÊ¾
 	cocos2d::Sprite* _sprite = nullptr;
 
 private:
-	// ÕâÀïÊÇÖğÖ¡µ÷ÓÃËùÓĞ¶ÔÏóµÄĞĞÎª¸üĞÂÏµÍ³µÄ´úÂë
 	void update(float dt) {
 		if (!isAlive()) {
 			return;

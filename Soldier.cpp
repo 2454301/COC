@@ -1,4 +1,4 @@
-#include "Soldier.h"
+ï»¿#include "Soldier.h"
 #include "Building.h"
 
 Soldier* Soldier::createBarbarian() {
@@ -16,12 +16,12 @@ bool Soldier::initBarbarian() {
 		return false;
 	}
 
-	// ´«Èë¶¯×÷Ïà¹ØÎÄ¼ş
+	// ä¼ å…¥åŠ¨ä½œç›¸å…³æ–‡ä»¶
 	cocos2d::SpriteFrameCache::getInstance()->addSpriteFramesWithFile("COCBarbarianrun.plist");
 	cocos2d::SpriteFrameCache::getInstance()->addSpriteFramesWithFile("COCBarbarianattack.plist");
 	cocos2d::SpriteFrameCache::getInstance()->addSpriteFramesWithFile("COCBarbariandie.plist");
 
-	// ¸ù¾İÎÄ¼ş½¨Á¢Ö¡¼¯ºÏ
+	// æ ¹æ®æ–‡ä»¶å»ºç«‹å¸§é›†åˆ
 	_runFrames.reserve(4);
 	for (int i = 1;i <= 4;i++) {
 		std::string frameName = cocos2d::StringUtils::format("barbarian run%d.png", i);
@@ -41,7 +41,7 @@ bool Soldier::initBarbarian() {
 		_dieFrames.pushBack(frame);
 	}
 
-	// Ò°ÂùÈËÏà¹ØÊıÖµ£¨Ôİ¶¨£©
+	// é‡è›®äººç›¸å…³æ•°å€¼ï¼ˆæš‚å®šï¼‰
 	_health = _maxHealth = 150.0f;
 	_attack = 10.0f;
 	_speed = 50.0f;
@@ -49,7 +49,7 @@ bool Soldier::initBarbarian() {
 
 	_resourceCost = 50.0f;
 
-	_sprite = cocos2d::Sprite::createWithSpriteFrameName("barbarian run1.png"); // ÕâÀïÊ¹ÓÃµÄÊÇÒÆ¶¯¶¯×÷µÚÒ»Ö¡
+	_sprite = cocos2d::Sprite::createWithSpriteFrameName("barbarian run1.png"); // è¿™é‡Œä½¿ç”¨çš„æ˜¯ç§»åŠ¨åŠ¨ä½œç¬¬ä¸€å¸§
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
 	return true;
@@ -92,7 +92,7 @@ bool Soldier::initArcher() {
 		_dieFrames.pushBack(frame);
 	}
 
-	// ¹­¼ıÊÖÏà¹ØÊıÖµ
+	// å¼“ç®­æ‰‹ç›¸å…³æ•°å€¼
 	_health = _maxHealth = 100.0f;
 	_attack = 10.0f;
 	_speed = 50.0f;
@@ -144,7 +144,7 @@ bool Soldier::initGiant() {
 		_dieFrames.pushBack(frame);
 	}
 
-	// ¾ŞÈËÏà¹ØÊıÖµ
+	// å·¨äººç›¸å…³æ•°å€¼
 	_health = _maxHealth = 250.0f;
 	_attack = 20.0f;
 	_speed = 30.0f;
@@ -198,7 +198,7 @@ bool Soldier::initGoblin() {
 		_dieFrames.pushBack(frame);
 	}
 
-	// ¸ç²¼ÁÖÏà¹ØÊıÖµ
+	// å“¥å¸ƒæ—ç›¸å…³æ•°å€¼
 	_health = _maxHealth = 80.0f;
 	_attack = 10.0f;
 	_speed = 100.0f;
@@ -214,7 +214,7 @@ bool Soldier::initGoblin() {
 	return true;
 }
 
-// Ñ°ÕÒ¹¥»÷Ä¿±êµÄÂß¼­
+// å¯»æ‰¾æ”»å‡»ç›®æ ‡çš„é€»è¾‘
 GameObject* Soldier::findNearestBuilding() {
 	if (_availableBuildings.empty()) {
 		return nullptr;
@@ -224,7 +224,7 @@ GameObject* Soldier::findNearestBuilding() {
 	float minDistance_1 = FLT_MAX, minDistance_2 = FLT_MAX;
 	cocos2d::Vec2 myPos = this->getPosition();
 
-	// ±éÀúËùÓĞ½¨Öş¶ÔÏó£¬ÕÒµ½·ûºÏÒªÇóµÄÎªµ±Ç°Ä¿±ê
+	// éå†æ‰€æœ‰å»ºç­‘å¯¹è±¡ï¼Œæ‰¾åˆ°ç¬¦åˆè¦æ±‚çš„ä¸ºå½“å‰ç›®æ ‡
 	for (auto building : _availableBuildings) {
 		if (building && building->isAlive() && !building->isDestroyed()) {
 			float distance = myPos.distance(building->getPosition());
@@ -246,7 +246,7 @@ GameObject* Soldier::findNearestBuilding() {
 	return nearest_1 != nullptr ? nearest_1 : nearest_2;
 }
 
-// ÉèÖÃ×Ô¼ºµÄ¹¥»÷Ä¿±ê
+// è®¾ç½®è‡ªå·±çš„æ”»å‡»ç›®æ ‡
 void Soldier::attack(GameObject* target) {
 	if (target == nullptr || !target->isAlive()) {
 		return;
@@ -258,20 +258,20 @@ void Soldier::attack(GameObject* target) {
 	_attackTimer = 0.0f;
 }
 
-// Í£Ö¹ĞĞÎª
+// åœæ­¢è¡Œä¸º
 void Soldier::stop() {
 	_isMoving = false;
 	_isAttacking = false;
 	_target = nullptr;
 }
 
-// ĞĞÎª¸üĞÂÏµÍ³£¨ÓÉÏµÍ³ÖğÖ¡µ÷ÓÃ£©
+// è¡Œä¸ºæ›´æ–°ç³»ç»Ÿï¼ˆç”±ç³»ç»Ÿé€å¸§è°ƒç”¨ï¼‰
 void Soldier::updateBehavior(float dt) {
 	if (!isAlive()) {
 		return;
 	}
 
-	// Èç¹û»¹Ã»ÓĞ¹¥»÷Ä¿±ê
+	// å¦‚æœè¿˜æ²¡æœ‰æ”»å‡»ç›®æ ‡
 	if (_target == nullptr || !_target->isAlive()) {
 		_target = findNearestBuilding();
 		if (_target) {
@@ -283,25 +283,25 @@ void Soldier::updateBehavior(float dt) {
 		}
 	}
 
-	// Èç¹ûÈ·¶¨¹¥»÷Ä¿±êÇÒÄ¿±ê´æ»î
+	// å¦‚æœç¡®å®šæ”»å‡»ç›®æ ‡ä¸”ç›®æ ‡å­˜æ´»
 	if (_isAttacking && _target && _target->isAlive()) {
 		float distance = this->getPosition().distance(_target->getPosition());
 
-		// Èç¹ûÄ¿±êÔÚ¹¥»÷·¶Î§ÄÚ
+		// å¦‚æœç›®æ ‡åœ¨æ”»å‡»èŒƒå›´å†…
 		if (distance <= _range) {
 			_isMoving = false;
 
 			_attackTimer += dt;
-			if (_attackTimer >= 1.0f) { // ÉèÖÃ¹¥ËÙ1Ãë
+			if (_attackTimer >= 1.0f) { // è®¾ç½®æ”»é€Ÿ1ç§’
 				_sprite->stopAllActions();
-				_target->onHit(_attack); // ¹¥»÷Ä¿±ê
+				_target->onHit(_attack); // æ”»å‡»ç›®æ ‡
 				auto animation = cocos2d::Animation::createWithSpriteFrames(_attackFrames, 0.1f);
 				auto animate = cocos2d::Animate::create(animation);
-				_sprite->runAction(animate); // ²¥·Å¹¥»÷¶¯×÷
+				_sprite->runAction(animate); // æ’­æ”¾æ”»å‡»åŠ¨ä½œ
 				_attackTimer = 0.0f;
 			}
 		}
-		// Èç¹ûÔÚ¹¥»÷·¶Î§Íâ
+		// å¦‚æœåœ¨æ”»å‡»èŒƒå›´å¤–
 		else {
 			_isMoving = true;
 
@@ -310,7 +310,7 @@ void Soldier::updateBehavior(float dt) {
 				_sprite->stopAllActions();
 				auto animation = cocos2d::Animation::createWithSpriteFrames(_runFrames, 0.1f);
 				auto animate = cocos2d::Animate::create(animation);
-				_sprite->runAction(animate); // ²¥·ÅÒÆ¶¯¶¯×÷
+				_sprite->runAction(animate); // æ’­æ”¾ç§»åŠ¨åŠ¨ä½œ
 				_runTimer = 0.0f;
 			}
 
@@ -318,24 +318,46 @@ void Soldier::updateBehavior(float dt) {
 			cocos2d::Vec2 targetPos = _target->getPosition();
 			cocos2d::Vec2 direction = targetPos - currentPos;
 
-			direction.normalize(); // ±ê×¼»¯
+			direction.normalize(); // æ ‡å‡†åŒ–
 
-			float moveDistance = _speed * dt; // Ã¿Ö¡ĞèÒªÒÆ¶¯
+			float moveDistance = _speed * dt; // æ¯å¸§éœ€è¦ç§»åŠ¨
 
 			cocos2d::Vec2 newPos = currentPos + direction * moveDistance;
 
-			this->setPosition(newPos); // ÉèÖÃĞÂÎ»ÖÃ£¬ÒòÎªÊÇÖğÖ¡µ÷ÓÃËùÒÔ²»ĞèÒªÓÃ¶¯×÷
+			// ç®€å•ç¢°æ’æ£€æµ‹ï¼šæ£€æŸ¥æ˜¯å¦ä¼šä¸å»ºç­‘é‡å 
+			bool willCollide = false;
+			for (auto building : _availableBuildings) {
+				if (building && building->isAlive() && building != _target) {
+					float dist = newPos.distance(building->getPosition());
+					float minDistance = building->getSize() / 2; // æœ€å°å®‰å…¨è·ç¦»
+					if (dist < minDistance) {
+						willCollide = true;
+						break;
+					}
+				}
+			}
+
+			if (!willCollide) {
+				this->setPosition(newPos);
+			}
+			else {
+				// å°†æ–¹å‘é¡ºæ—¶é’ˆè½¬90åº¦
+				auto t = direction.x = -direction.x;
+				direction.x = direction.y;
+				direction.y = t;
+
+				newPos = currentPos + direction * moveDistance;
+				this->setPosition(newPos);
+			}
 
 			if (_sprite) {
 				_sprite->setPosition(cocos2d::Vec2::ZERO);
 			}
 		}
 	}
-
-
 }
 
-// ÊÜ»÷
+// å—å‡»
 void Soldier::onHit(float damage) {
 	_health -= damage;
 	if (!isAlive()) {
@@ -343,7 +365,7 @@ void Soldier::onHit(float damage) {
 	}
 }
 
-// ËÀÁË
+// æ­»äº†
 void Soldier::onDestroy() {
 	GameObject::onDestroy();
 
@@ -364,5 +386,5 @@ void Soldier::onDestroy() {
 		removeAction,
 		nullptr
 	);
-	this->runAction(sequence); // ²¥·ÅËÀÍö¶¯×÷£¬È»ºóÒÆ³ı
+	this->runAction(sequence); // æ’­æ”¾æ­»äº¡åŠ¨ä½œï¼Œç„¶åç§»é™¤
 }

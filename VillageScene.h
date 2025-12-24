@@ -1,13 +1,13 @@
-#ifndef __VILLAGE_SCENE_H__
+ï»¿#ifndef __VILLAGE_SCENE_H__
 #define __VILLAGE_SCENE_H__
 
 #include "cocos2d.h"
 
-// ÀàÉùÃ÷
+// ç±»å£°æ˜
 class Soldier;
 class DraggableBuildings;
 
-// Ö÷´æ×¯Àà
+// ä¸»å­˜åº„ç±»
 class Village : public cocos2d::Scene {
 public:
 	static cocos2d::Scene* createScene();
@@ -15,50 +15,78 @@ public:
 
 	virtual bool init();
 
-	// ×ÊÔ´´¦ÀíÏà¹Øº¯Êı
+	// èµ„æºå¤„ç†ç›¸å…³å‡½æ•°
 	void addGold(float gold);
 	void addElixir(float elixir);
 	void reduceGold(float gold);
 	void reduceElixir(float elixir);
 	bool goldIsEnough(float gold);
 	bool elixirIsEnough(float elixir);
+	bool soldierIsFull() {
+		return _numOfBarbarians + _numOfArchers + _numOfGiants + _numOfGoblins == _maxSoldier;
+	}
 
-	// ½¨Öş´¦ÀíÏà¹Øº¯Êı
+	// å®¹é‡æ‰©å……ç›¸å…³å‡½æ•°
+	void promoteGoldVolume() {
+		_maxGold += 1000;
+	}
+	void promoteElixirVolume() {
+		_maxElixir += 1000;
+	}
+	void promoteSoldierVolume() {
+		_maxSoldier += 20;
+	}
+
+	// å»ºç­‘å¤„ç†ç›¸å…³å‡½æ•°
 	void addBuilding(DraggableBuildings* building);
 	bool isTouching(DraggableBuildings* pointBuilding);
 
-	// ¸üĞÂ×ÊÔ´±êÇ©
+	// æ›´æ–°èµ„æºæ ‡ç­¾
 	void updateResourceLabels();
 
-	// ¸ßÁÁÏÔÊ¾Ïà¹Øº¯Êı
+	// æ›´æ–°å…µç§æ ‡ç­¾
+	void updateTroopLabels();
+
+	// é«˜äº®æ˜¾ç¤ºç›¸å…³å‡½æ•°
 	void showBuildingOutlines();
 	void hideBuildingOutlines();
 	void showGridArea();
 	void hideGridArea();
 
-	// ÑµÁ·µÄ±øÖÖÊıÁ¿
+	// è®­ç»ƒçš„å…µç§æ•°é‡
 	int _numOfBarbarians = 0;
 	int _numOfArchers = 0;
 	int _numOfGiants = 0;
 	int _numOfGoblins = 0;
 
-	// ³¡ÉÏµÄ½¨Öş¼¯ºÏ
+	// åœºä¸Šçš„å»ºç­‘é›†åˆ
 	std::vector<DraggableBuildings*> _myBuildings;
 
 private:
-	// ³õÊ¼½ğ±Ò¡¢Ê¥Ë®
+	// åˆå§‹é‡‘å¸ã€åœ£æ°´
 	float _gold = 1000.0f;
 	float _elixir = 1000.0f;
 
-	// ½ğ±Ò¡¢Ê¥Ë®ÊıÁ¿±êÇ©
+	float _maxGold = 3000.0f;
+	float _maxElixir = 3000.0f;
+	int _maxSoldier = 20.0f;
+
+	// é‡‘å¸ã€åœ£æ°´æ•°é‡æ ‡ç­¾
 	cocos2d::Label* _goldLabel = nullptr;
 	cocos2d::Label* _elixirLabel = nullptr;
 
-	// ¸ßÁÁÏÔÊ¾Ïà¹Ø
+	// å…µç§æ•°é‡æ ‡ç­¾
+	cocos2d::Label* _barbarianLabel = nullptr;
+	cocos2d::Label* _archerLabel = nullptr;
+	cocos2d::Label* _giantLabel = nullptr;
+	cocos2d::Label* _goblinLabel = nullptr;
+	cocos2d::Label* _troopLabel = nullptr;
+
+	// é«˜äº®æ˜¾ç¤ºç›¸å…³
 	cocos2d::DrawNode* _buildingOutlineDrawNode = nullptr;
 	cocos2d::DrawNode* _gridAreaDrawNode = nullptr;
 
-	// ¹Ø¿¨ÏµÍ³Ïà¹Ø²Ëµ¥°´Å¥¼°»Øµ÷º¯Êı
+	// å…³å¡ç³»ç»Ÿç›¸å…³èœå•æŒ‰é’®åŠå›è°ƒå‡½æ•°
 	cocos2d::MenuItemImage* levelItem;
 	cocos2d::MenuItemImage* levelItem_1;
 	cocos2d::MenuItemImage* levelItem_2;
@@ -69,10 +97,10 @@ private:
 	void levelCallBack_3(cocos2d::Ref* psender);
 };
 
-// ¿ÉÍÏ¶¯½¨ÖşÀà£¨Ö÷´å×¯ºÍ¹Ø¿¨ÖĞµÄ½¨ÖşĞèÒªÊµÏÖµÄ¹¦ÄÜ²»Ò»Ñù£¬¹ÊĞÂĞ´Ò»¸öÀà£©
+// å¯æ‹–åŠ¨å»ºç­‘ç±»ï¼ˆä¸»æ‘åº„å’Œå…³å¡ä¸­çš„å»ºç­‘éœ€è¦å®ç°çš„åŠŸèƒ½ä¸ä¸€æ ·ï¼Œæ•…æ–°å†™ä¸€ä¸ªç±»ï¼‰
 class DraggableBuildings : public cocos2d::Sprite {
 public:
-	// Ã¶¾Ù½¨ÖşÖÖÀà
+	// æšä¸¾å»ºç­‘ç§ç±»
 	enum BuildingType {
 		NONE,
 		TOWN_HALL,
@@ -80,13 +108,15 @@ public:
 		GOLD_MINE,
 		ELIXIR_COLLECTOR,
 		ARMY_CAMP,
-		BARRACKS
+		BARRACKS,
+		GOLD_STORAGE,
+		ELIXIR_STORAGE
 	};
 
 	static DraggableBuildings* create(const std::string& filename);
 	virtual bool init(const std::string& filename);
 
-	// ³õÊ¼»¯Ïà¹ØÉèÖÃº¯Êı
+	// åˆå§‹åŒ–ç›¸å…³è®¾ç½®å‡½æ•°
 	void setDraggable(bool draggable);
 	void setVillage(Village* village);
 	bool isDragging() {
@@ -96,10 +126,10 @@ public:
 		_size = size;
 	}
 
-	// Éı¼¶º¯Êı
+	// å‡çº§å‡½æ•°
 	void upgrade();
 
-	// ÉèÖÃºÍ»ñÈ¡½¨ÖşÖÖÀà
+	// è®¾ç½®å’Œè·å–å»ºç­‘ç§ç±»
 	void setBuildingType(BuildingType type) {
 		_buildingType = type;
 	}
@@ -107,36 +137,36 @@ public:
 		return _buildingType;
 	}
 
-	// µã»÷»Øµ÷º¯Êı
+	// ç‚¹å‡»å›è°ƒå‡½æ•°
 	void onBuildingClicked();
 
-	// ²Ëµ¥À¸Ïà¹Øº¯Êı
+	// èœå•æ ç›¸å…³å‡½æ•°
 	void initInfoPanel();
 	void showInfoPanel();
 	void hideInfoPanel();
 	void hideOtherBuildingPanels();
 
 private:
-	// ÅĞ¶ÏÍÏ¶¯Ïà¹Ø
+	// åˆ¤æ–­æ‹–åŠ¨ç›¸å…³
 	bool _isDragging = false;
 	bool _hasMoved = false;
 
-	// ×ø±êÉèÖÃÏà¹Ø
+	// åæ ‡è®¾ç½®ç›¸å…³
 	cocos2d::Vec2 _dragOffset;
 	cocos2d::Vec2 _originalPos;
 	cocos2d::Vec2 _touchBeganPos;
 	int _size = 0;
 	
-	// µÈ¼¶£¨³õÊ¼1¼¶£©
+	// ç­‰çº§ï¼ˆåˆå§‹1çº§ï¼‰
 	int _level = 1;
 
-	// ½¨ÖşÖÖÀà
+	// å»ºç­‘ç§ç±»
 	BuildingType _buildingType = NONE;
 
-	// ºÍÖ÷´å×¯¹ØÁª
+	// å’Œä¸»æ‘åº„å…³è”
 	Village* _village = nullptr;
 
-	// ¸÷ÖÖ²Ëµ¥Ïî
+	// å„ç§èœå•é¡¹
 	cocos2d::Label* _levelLabel = nullptr;
 	cocos2d::MenuItemImage* _upgradeButton = nullptr;
 	cocos2d::MenuItemImage* _collectButton = nullptr;
@@ -149,22 +179,22 @@ private:
 	cocos2d::Menu* _infoMenu = nullptr;
 	bool _infoPanelVisible = false;
 
-	// ´¥ÃşÊÂ¼ş»Øµ÷
+	// è§¦æ‘¸äº‹ä»¶å›è°ƒ
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
 
-	// Éı¼¶¡¢ÊÕ¼¯»Øµ÷
+	// å‡çº§ã€æ”¶é›†å›è°ƒ
 	void onUpgradeClicked(cocos2d::Ref* sender);
 	void onCollectClicked(cocos2d::Ref* sender);
 
-	// ÑµÁ·»Øµ÷
+	// è®­ç»ƒå›è°ƒ
 	void onTrainBarbarianClicked(cocos2d::Ref* sender);
 	void onTrainArcherClicked(cocos2d::Ref* sender);
 	void onTrainGiantClicked(cocos2d::Ref* sender);
 	void onTrainGoblinClicked(cocos2d::Ref* sender);
 
-	// ¸üĞÂ²Ëµ¥
+	// æ›´æ–°èœå•
 	void updateInfoPanel();
 };
 
