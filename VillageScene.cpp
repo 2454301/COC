@@ -2,6 +2,7 @@
 #include "Soldier.h"
 #include "Building.h"
 #include "GameScene.h"
+#include "audio/include/SimpleAudioEngine.h"
 
 USING_NS_CC;
 
@@ -148,6 +149,10 @@ bool Village::init() {
 	auto menu = Menu::create(levelItem, levelItem_1, levelItem_2, levelItem_3, nullptr);
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 11);
+
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->preloadBackgroundMusic("Home Village Music.mp3");
+	audio->playBackgroundMusic("Home Village Music.mp3", true);
 
 	return true;
 }
@@ -322,6 +327,16 @@ bool Village::isTouching(DraggableBuildings* pointBuilding) {
 		}
 	}
 	return false;
+}
+
+void Village::onEnter() {
+	Scene::onEnter();
+
+	// 确保主村庄音乐在进入场景时播放
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	if (!audio->isBackgroundMusicPlaying()) {
+		audio->playBackgroundMusic("Home Village Music.mp3", true);
+	}
 }
 
 // 主村庄中建筑的创建
@@ -726,6 +741,9 @@ void Village::levelCallBack_1(Ref* psender) {
 		level->setVillage(this); // 让关卡场景可以访问主村庄场景
 	}
 
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->stopBackgroundMusic();
+
 	Director::getInstance()->pushScene(levelscene); // 关卡场景进栈
 }
 
@@ -742,6 +760,9 @@ void Village::levelCallBack_2(Ref* psender) {
 		level->setVillage(this);
 	}
 
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->stopBackgroundMusic();
+
 	Director::getInstance()->pushScene(levelscene);
 }
 
@@ -757,6 +778,9 @@ void Village::levelCallBack_3(Ref* psender) {
 		level->setTroopCounts(_numOfBarbarians, _numOfArchers, _numOfGiants, _numOfGoblins);
 		level->setVillage(this);
 	}
+
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->stopBackgroundMusic();
 
 	Director::getInstance()->pushScene(levelscene);
 }

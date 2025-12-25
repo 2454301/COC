@@ -53,6 +53,8 @@ public:
 	void showGridArea();
 	void hideGridArea();
 
+	virtual void onEnter() override;
+
 	// 训练的兵种数量
 	int _numOfBarbarians = 0;
 	int _numOfArchers = 0;

@@ -51,6 +51,8 @@ public:
         }
     }
 
+    virtual void onEnter() override;
+
 protected:
     // 触摸开始和结束检测函数
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);

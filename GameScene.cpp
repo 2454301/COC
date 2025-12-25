@@ -1,6 +1,7 @@
 ﻿#include "GameScene.h"
 #include "Soldier.h"
 #include "Building.h"
+#include "audio/include/SimpleAudioEngine.h"
 
 USING_NS_CC;
 
@@ -123,6 +124,9 @@ void Game::update(float dt) {
 
         auto delay = DelayTime::create(1.0f);
         auto popScene = CallFunc::create([]() {
+            auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+            audio->stopBackgroundMusic();
+
             Director::getInstance()->popScene();
             });
         this->runAction(Sequence::create(delay, popScene, nullptr)); // 播放胜利CG
@@ -150,6 +154,9 @@ void Game::update(float dt) {
 
         auto delay = DelayTime::create(1.0f);
         auto popScene = CallFunc::create([]() {
+            auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+            audio->stopBackgroundMusic();
+
             Director::getInstance()->popScene();
             });
         this->runAction(Sequence::create(delay, popScene, nullptr)); // 播放战败CG
@@ -551,5 +558,18 @@ void Game::onGoblinClicked(Ref* sender) {
         _selectedSoldierButton = button;
         _selectedSoldierButton->setPosition(cocos2d::Vec2(_selectedSoldierButton->getPositionX(),
             _selectedSoldierButton->getPositionY() + 50));
+    }
+}
+
+void Game::onEnter() {
+    Scene::onEnter();
+
+    // 确保主场景音乐在进入场景时播放
+    auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+
+    // 如果背景音乐没有在播放，则开始播放
+    if (!audio->isBackgroundMusicPlaying()) {
+        audio->preloadBackgroundMusic("Home Village Combat Music.mp3");
+        audio->playBackgroundMusic("Home Village Combat Music.mp3", true);
     }
 }
