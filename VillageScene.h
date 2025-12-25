@@ -34,7 +34,7 @@ public:
 		_maxElixir += 1000;
 	}
 	void promoteSoldierVolume() {
-		_maxSoldier += 20;
+		_maxSoldier += 40;
 	}
 
 	// 建筑处理相关函数
@@ -178,6 +178,8 @@ private:
 
 	cocos2d::Menu* _infoMenu = nullptr;
 	bool _infoPanelVisible = false;
+
+	int _originalZOrder = 0;
 
 	// 触摸事件回调
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);

@@ -104,11 +104,29 @@ protected:
     Village* _village = nullptr;
 };
 
-// 继承自Game类的关卡，后续可添加2、3关
+// 继承自Game类的关卡
 class Level_1 : public Game {
 public:
     static cocos2d::Scene* createScene();
     CREATE_FUNC(Level_1);
+
+protected:
+    void createInitialBuildings() override; // 重写初始建筑布局
+};
+
+class Level_2 : public Game {
+public:
+    static cocos2d::Scene* createScene();
+    CREATE_FUNC(Level_2);
+
+protected:
+    void createInitialBuildings() override; // 重写初始建筑布局
+};
+
+class Level_3 : public Game {
+public:
+    static cocos2d::Scene* createScene();
+    CREATE_FUNC(Level_3);
 
 protected:
     void createInitialBuildings() override; // 重写初始建筑布局

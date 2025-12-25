@@ -101,9 +101,8 @@ bool Village::init() {
 	addBuilding(elixirCollector);
 
 	// 放置建筑训练营
-	auto armyCamp = DraggableBuildings::create("ArmyCamp.png");
+	auto armyCamp = DraggableBuildings::create("COCArmy Camp.png");
 	armyCamp->setPosition(Vec2(1120, 480));
-	armyCamp->setScale(0.32);
 	armyCamp->setAnchorPoint(Vec2(0, 0));
 	armyCamp->setSize(32);
 	armyCamp->setVillage(this);
@@ -491,9 +490,11 @@ void DraggableBuildings::upgrade() {
 
 			case ELIXIR_STORAGE:
 				_village->promoteElixirVolume();
+				break;
 
 			case BARRACKS:
 				_village->promoteSoldierVolume();
+				break;
 			}
 
 			_village->updateResourceLabels();
@@ -555,6 +556,9 @@ void DraggableBuildings::showInfoPanel() {
 		return;
 	}
 
+	_originalZOrder = this->getLocalZOrder();
+	this->setLocalZOrder(999); // 这是为了让菜单浮于其他建筑之上，避免被遮挡
+
 	hideOtherBuildingPanels();
 	updateInfoPanel();
 
@@ -584,6 +588,13 @@ void DraggableBuildings::hideInfoPanel() {
 	_levelLabel->setVisible(false);
 	_infoMenu->setVisible(false);
 	_infoPanelVisible = false;
+
+	if (_originalZOrder != 0) {
+		this->setLocalZOrder(_originalZOrder);
+	}
+	else {
+		this->setLocalZOrder(0); // 默认值
+	}
 }
 
 // 隐藏其他建筑相关菜单
@@ -719,9 +730,33 @@ void Village::levelCallBack_1(Ref* psender) {
 }
 
 void Village::levelCallBack_2(Ref* psender) {
-	// 2、3关未完成
+	if (_numOfBarbarians == 0 && _numOfArchers == 0 && _numOfGiants == 0 && _numOfGoblins == 0) {
+		return;
+	}
+
+	auto levelscene = Level_2::createScene();
+
+	auto level = dynamic_cast<Level_2*>(levelscene);
+	if (level) {
+		level->setTroopCounts(_numOfBarbarians, _numOfArchers, _numOfGiants, _numOfGoblins);
+		level->setVillage(this);
+	}
+
+	Director::getInstance()->pushScene(levelscene);
 }
 
 void Village::levelCallBack_3(Ref* psender) {
+	if (_numOfBarbarians == 0 && _numOfArchers == 0 && _numOfGiants == 0 && _numOfGoblins == 0) {
+		return;
+	}
 
+	auto levelscene = Level_3::createScene();
+
+	auto level = dynamic_cast<Level_3*>(levelscene);
+	if (level) {
+		level->setTroopCounts(_numOfBarbarians, _numOfArchers, _numOfGiants, _numOfGoblins);
+		level->setVillage(this);
+	}
+
+	Director::getInstance()->pushScene(levelscene);
 }

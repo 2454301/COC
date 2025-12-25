@@ -14,6 +14,8 @@ public:
 	static Building* createElixirCollector();
 	static Building* createArmyCamp(); // 训练营
 	static Building* createBarracks(); // 兵营
+	static Building* createGoldStorage();
+	static Building* createElixirStorage();
 
 	// 设置攻击目标
 	void attack(GameObject* target);
@@ -49,6 +51,8 @@ private:
 	bool initElixirCollector();
 	bool initArmyCamp();
 	bool initBarracks();
+	bool initGoldStorage();
+	bool initElixirStorage();
 
 
 	// 等级

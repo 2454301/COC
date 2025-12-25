@@ -74,7 +74,7 @@ bool Building::initArmyCamp() {
 	_health = _maxHealth = 300.0f;
 	_size = 64;
 
-	_sprite = cocos2d::Sprite::create("ArmyCamp.png");
+	_sprite = cocos2d::Sprite::create("COCArmy Camp.png");
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
 	return true;
@@ -151,6 +151,58 @@ bool Building::initElixirCollector() {
 	_size = 64;
 
 	_sprite = cocos2d::Sprite::create("COCElixir Collector.png");
+	this->addChild(_sprite);
+	_sprite->setPosition(cocos2d::Vec2::ZERO);
+	return true;
+}
+
+Building* Building::createGoldStorage() {
+	Building* building = new Building();
+	if (building && building->initGoldStorage()) {
+		building->autorelease();
+		return building;
+	}
+	delete building;
+	return nullptr;
+}
+
+bool Building::initGoldStorage() {
+	if (!GameObject::init()) {
+		return false;
+	}
+
+	_health = _maxHealth = 300.0f;
+	_type = BUILDING_RESOURCE;
+
+	_size = 64;
+
+	_sprite = cocos2d::Sprite::create("COCGold Storage.png");
+	this->addChild(_sprite);
+	_sprite->setPosition(cocos2d::Vec2::ZERO);
+	return true;
+}
+
+Building* Building::createElixirStorage() {
+	Building* building = new Building();
+	if (building && building->initElixirStorage()) {
+		building->autorelease();
+		return building;
+	}
+	delete building;
+	return nullptr;
+}
+
+bool Building::initElixirStorage() {
+	if (!GameObject::init()) {
+		return false;
+	}
+
+	_health = _maxHealth = 300.0f;
+	_type = BUILDING_RESOURCE;
+
+	_size = 64;
+
+	_sprite = cocos2d::Sprite::create("COCElixir Storage.png");
 	this->addChild(_sprite);
 	_sprite->setPosition(cocos2d::Vec2::ZERO);
 	return true;

@@ -16,6 +16,14 @@ Scene* Level_1::createScene() {
     return Level_1::create();
 }
 
+Scene* Level_2::createScene() {
+    return Level_2::create();
+}
+
+Scene* Level_3::createScene() {
+    return Level_3::create();
+}
+
 // 初始化
 bool Game::init() {
     if (!Scene::init()) {
@@ -103,6 +111,10 @@ void Game::update(float dt) {
 
     // 胜利判断逻辑
     if (_buildings.empty()) { // 场上建筑均被摧毁
+        this->unscheduleUpdate();
+
+        _eventDispatcher->removeEventListenersForTarget(this);
+
         auto victory = Sprite::create("Victory.png");
         victory->setPosition(Vec2(352, 352));
         this->addChild(victory, 11);
@@ -110,11 +122,11 @@ void Game::update(float dt) {
         updateVillageTroopCounts();
 
         auto delay = DelayTime::create(1.0f);
-        this->runAction(delay);
         auto popScene = CallFunc::create([]() {
             Director::getInstance()->popScene();
             });
         this->runAction(Sequence::create(delay, popScene, nullptr)); // 播放胜利CG
+        return;
     }
     
     // 失败判断逻辑
@@ -159,10 +171,6 @@ void Game::updateTroopLabels() {
 // 初始化建筑
 // 第一关的建筑布局
 void Level_1::createInitialBuildings() {
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    float x = visibleSize.width;
-    float y = visibleSize.height;
-
     auto townHall = Building::createTownHall();
     townHall->setPosition(Vec2(1040, 592));
     this->addChild(townHall);
@@ -172,6 +180,112 @@ void Level_1::createInitialBuildings() {
     cannon->setPosition(Vec2(1120, 672));
     this->addChild(cannon);
     _buildings.push_back(cannon);
+}
+
+// 第二关的建筑布局
+void Level_2::createInitialBuildings() {
+    auto townHall = Building::createTownHall();
+    townHall->setPosition(Vec2(1040, 592));
+    this->addChild(townHall);
+    _buildings.push_back(townHall);
+
+    auto cannon1 = Building::createCannon();
+    cannon1->setPosition(Vec2(1120, 608));
+    this->addChild(cannon1);
+    _buildings.push_back(cannon1);
+    auto cannon2 = Building::createCannon();
+    cannon2->setPosition(Vec2(960, 576));
+    this->addChild(cannon2);
+    _buildings.push_back(cannon2);
+
+    auto goldMine = Building::createGoldMine();
+    goldMine->setPosition(Vec2(992, 672));
+    this->addChild(goldMine);
+    _buildings.push_back(goldMine);
+
+    auto elixirCollector = Building::createElixirCollector();
+    elixirCollector->setPosition(Vec2(1088, 512));
+    this->addChild(elixirCollector);
+    _buildings.push_back(elixirCollector);
+}
+
+// 第三关的建筑布局
+void Level_3::createInitialBuildings() {
+    auto townHall = Building::createTownHall();
+    townHall->setPosition(Vec2(1040, 592));
+    this->addChild(townHall);
+    _buildings.push_back(townHall);
+
+    auto cannon1 = Building::createCannon();
+    cannon1->setPosition(Vec2(1120, 576));
+    this->addChild(cannon1);
+    _buildings.push_back(cannon1);
+    auto cannon2 = Building::createCannon();
+    cannon2->setPosition(Vec2(960, 608));
+    this->addChild(cannon2);
+    _buildings.push_back(cannon2);
+    auto cannon3 = Building::createCannon();
+    cannon3->setPosition(Vec2(1056, 672));
+    this->addChild(cannon3);
+    _buildings.push_back(cannon3);
+    auto cannon4 = Building::createCannon();
+    cannon4->setPosition(Vec2(1024, 512));
+    this->addChild(cannon4);
+    _buildings.push_back(cannon4);
+
+    auto goldMine1 = Building::createGoldMine();
+    goldMine1->setPosition(Vec2(960, 544));
+    this->addChild(goldMine1);
+    _buildings.push_back(goldMine1);
+    auto goldMine2 = Building::createGoldMine();
+    goldMine2->setPosition(Vec2(1120, 640));
+    this->addChild(goldMine2);
+    _buildings.push_back(goldMine2);
+
+    auto goldStorage1 = Building::createGoldStorage();
+    goldStorage1->setPosition(Vec2(960, 480));
+    this->addChild(goldStorage1);
+    _buildings.push_back(goldStorage1);
+    auto goldStorage2 = Building::createGoldStorage();
+    goldStorage2->setPosition(Vec2(1120, 704));
+    this->addChild(goldStorage2);
+    _buildings.push_back(goldStorage2);
+
+    auto elixirCollector1 = Building::createElixirCollector();
+    elixirCollector1->setPosition(Vec2(992, 672));
+    this->addChild(elixirCollector1);
+    _buildings.push_back(elixirCollector1);
+    auto elixirCollector2 = Building::createElixirCollector();
+    elixirCollector2->setPosition(Vec2(1088, 512));
+    this->addChild(elixirCollector2);
+    _buildings.push_back(elixirCollector2);
+
+    auto elixirStorage1 = Building::createElixirStorage();
+    elixirStorage1->setPosition(Vec2(928, 672));
+    this->addChild(elixirStorage1);
+    _buildings.push_back(elixirStorage1);
+    auto elixirStorage2 = Building::createElixirStorage();
+    elixirStorage2->setPosition(Vec2(1152, 512));
+    this->addChild(elixirStorage2);
+    _buildings.push_back(elixirStorage2);
+
+    auto armyCamp1 = Building::createArmyCamp();
+    armyCamp1->setPosition(Vec2(1024, 736));
+    this->addChild(armyCamp1);
+    _buildings.push_back(armyCamp1);
+    auto armyCamp2 = Building::createArmyCamp();
+    armyCamp2->setPosition(Vec2(1056, 448));
+    this->addChild(armyCamp2);
+    _buildings.push_back(armyCamp2);
+
+    auto barracks1 = Building::createBarracks();
+    barracks1->setPosition(Vec2(880, 592));
+    this->addChild(barracks1);
+    _buildings.push_back(barracks1);
+    auto barracks2 = Building::createBarracks();
+    barracks2->setPosition(Vec2(1200, 592));
+    this->addChild(barracks2);
+    _buildings.push_back(barracks2);
 }
 
 // 创建兵种选择菜单
@@ -268,6 +382,17 @@ void Game::onTouchEnded(Touch* touch, Event* event) {
     // 点击位置不在菱形内，则点击无效
     if (!isPointInDiamond(touchLocation)) {
         return;
+    }
+
+    // 检查点击位置是否在建筑上
+    for (auto building : _buildings) {
+        if (building && building->isAlive() && !building->isDestroyed()) {
+            // 检查触摸点是否在建筑范围内
+            if (fabs(touchLocation.x - building->getPosition().x) <= building->getSize() && fabs(touchLocation.y - building->getPosition().y) <= building->getSize()) {
+                // 点击位置在建筑上，禁止下兵
+                return;
+            }
+        }
     }
 
     Soldier* newSoldier = nullptr;
