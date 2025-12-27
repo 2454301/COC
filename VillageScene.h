@@ -2,6 +2,7 @@
 #define __VILLAGE_SCENE_H__
 
 #include "cocos2d.h"
+#include "ui/CocosGUI.h"
 
 // 类声明
 class Soldier;
@@ -34,7 +35,7 @@ public:
 		_maxElixir += 1000;
 	}
 	void promoteSoldierVolume() {
-		_maxSoldier += 40;
+		_maxSoldier += 20;
 	}
 
 	// 建筑处理相关函数
@@ -52,8 +53,6 @@ public:
 	void hideBuildingOutlines();
 	void showGridArea();
 	void hideGridArea();
-
-	virtual void onEnter() override;
 
 	// 训练的兵种数量
 	int _numOfBarbarians = 0;
@@ -97,6 +96,7 @@ private:
 	void levelCallBack_1(cocos2d::Ref* psender);
 	void levelCallBack_2(cocos2d::Ref* psender);
 	void levelCallBack_3(cocos2d::Ref* psender);
+	void playCialloEffect(cocos2d::Vec2 pos);
 };
 
 // 可拖动建筑类（主村庄和关卡中的建筑需要实现的功能不一样，故新写一个类）
@@ -115,10 +115,17 @@ public:
 		ELIXIR_STORAGE
 	};
 
+	virtual void update(float dt) override;
 	static DraggableBuildings* create(const std::string& filename);
 	virtual bool init(const std::string& filename);
+	void produceResource(float dt);
+	int getLevel() const {return _level;}
+	cocos2d::ui::LoadingBar* _productionBar =nullptr; // 资源产出进度条
+	cocos2d::Node* _productionNode =nullptr;          // 资源条容器
+	float _maxCapacity = 500.0f;                      // 建筑自身的存储上限
 
 	// 初始化相关设置函数
+	void showFullTip(const std::string& msg);
 	void setDraggable(bool draggable);
 	void setVillage(Village* village);
 	bool isDragging() {
@@ -132,9 +139,7 @@ public:
 	void upgrade();
 
 	// 设置和获取建筑种类
-	void setBuildingType(BuildingType type) {
-		_buildingType = type;
-	}
+	void setBuildingType(BuildingType type);
 	BuildingType getBuildingType() {
 		return _buildingType;
 	}
@@ -150,8 +155,13 @@ public:
 
 private:
 	// 判断拖动相关
+
 	bool _isDragging = false;
 	bool _hasMoved = false;
+	cocos2d::Sprite* _sakikoSprite =nullptr;
+
+	cocos2d::Sprite* _healthBarBackground =nullptr; // 血条背景（可选）
+	cocos2d::ui::LoadingBar* _healthBar =nullptr;   // 核心血条
 
 	// 坐标设置相关
 	cocos2d::Vec2 _dragOffset;
@@ -161,6 +171,8 @@ private:
 	
 	// 等级（初始1级）
 	int _level = 1;
+
+	float _currentInternalResource = 0.0f;
 
 	// 建筑种类
 	BuildingType _buildingType = NONE;
@@ -178,10 +190,16 @@ private:
 	cocos2d::MenuItemImage* _trainGiantButton = nullptr;
 	cocos2d::MenuItemImage* _trainGoblinButton = nullptr;
 
+	bool _isUpgrading = false;          // 是否正在升级
+	float _upgradeTimer = 0.0f;         // 剩余时间倒计时
+	float _totalUpgradeTime = 0.0f;     // 总升级所需时间
+
+	// UI 指针
+	cocos2d::ui::LoadingBar* _progressBar = nullptr; // 绿色条
+	cocos2d::Node* _progressNode = nullptr;          // 进度条整体容器
+
 	cocos2d::Menu* _infoMenu = nullptr;
 	bool _infoPanelVisible = false;
-
-	int _originalZOrder = 0;
 
 	// 触摸事件回调
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
