@@ -1,4 +1,4 @@
-#include "HelloWorldScene.h"
+ï»¿#include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
 #include "GameScene.h"
 #include "VillageScene.h"
@@ -9,72 +9,91 @@ Scene* HelloWorld::createScene() {
     return HelloWorld::create();
 }
 
-// ¶Ô´íÎóÇé¿öµÄ´¦Àí·½Ê½
+// å¯¹é”™è¯¯æƒ…å†µçš„å¤„ç†æ–¹å¼
 static void problemLoading(const char* filename) {
     printf("Error while loading: %s\n", filename);
     printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
 }
 
-// ¶Ô³õÊ¼»¯º¯ÊýinitµÄÊµÏÖ
+// å¯¹åˆå§‹åŒ–å‡½æ•°initçš„å®žçŽ°
 bool HelloWorld::init() {
-    // Ì×Â·£¬ÏÈµ÷ÓÃ¸¸ÀàµÄ³õÊ¼»¯º¯Êý
-    if ( !Scene::init() ) {
+    if (!Scene::init()) {
         return false;
     }
 
-    // »ñÈ¡¿ÉÊÓ·¶Î§ÐÅÏ¢
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
-    // ´´½¨Ò»¸ö¡°¿ªÊ¼ÓÎÏ·¡±°´Å¥
+    // 1. åˆ›å»ºå¼€å§‹æŒ‰é’®
     auto startItem = MenuItemImage::create("GameStartButton.png", "GameStartButton.png", CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
 
     if (startItem == nullptr || startItem->getContentSize().width <= 0 || startItem->getContentSize().height <= 0) {
-        problemLoading("'GameStartButton.png' and 'GameStartButton.png'");
+        problemLoading("'GameStartButton.png'");
     }
     else {
-        float x = visibleSize.width / 2;
-        float y = 200;
+        startItem->setPosition(Vec2(visibleSize.width / 2, 200));
+        startItem->setScale(1.2f);
 
-        // ÉèÖÃ°´Å¥µÄÎ»ÖÃ×ø±ê£¨ÆÁÄ»ÖÐ¼äÆ«ÏÂÎ»ÖÃ£©
-        startItem->setPosition(Vec2(x,y));
+        auto runBreathAction = [startItem]() {
+            startItem->stopAllActions();
+            auto scaleUp = EaseSineInOut::create(ScaleTo::create(1.5f, 1.3f));
+            auto scaleDown = EaseSineInOut::create(ScaleTo::create(1.5f, 1.2f));
+            startItem->runAction(RepeatForever::create(Sequence::create(scaleUp, scaleDown, nullptr)));
+            };
 
-        // ÉèÖÃ°´Å¥´óÐ¡
-        startItem->setScale(1.2);
+        // åˆå§‹å¯åŠ¨å‘¼å¸
+        runBreathAction();
+
+        // --- âœ¨ æ ¸å¿ƒä¿®æ”¹ï¼šæ·»åŠ é¼ æ ‡ç›‘å¬å™¨ ---
+        auto mouseListener = EventListenerMouse::create();
+
+        // è®°å½•é¼ æ ‡æ˜¯å¦å·²ç»åœ¨æŒ‰é’®ä¸Šçš„çŠ¶æ€ï¼Œé˜²æ­¢é‡å¤è§¦å‘åŠ¨ç”»
+        static bool isMouseOver = false;
+
+        mouseListener->onMouseMove = [startItem, runBreathAction](Event* event) mutable {
+            EventMouse* e = (EventMouse*)event;
+            Vec2 location = e->getLocationInView();
+            // åæ ‡è½¬æ¢ï¼šå°†å±å¹•åæ ‡è½¬ä¸ºç›¸å¯¹äºŽçˆ¶èŠ‚ç‚¹çš„åæ ‡
+            Vec2 localPos = startItem->getParent()->convertToNodeSpace(location);
+
+            // æ£€æŸ¥é¼ æ ‡æ˜¯å¦åœ¨æŒ‰é’®çš„èŒƒå›´å†…
+            if (startItem->getBoundingBox().containsPoint(localPos)) {
+                if (!isMouseOver) { // åªæœ‰â€œæ–°ç§»å…¥â€æ—¶æ‰æ‰§è¡Œ
+                    isMouseOver = true;
+                    startItem->stopAllActions(); // åœæ­¢å‘¼å¸
+                    // ä¸æ»‘å˜å¤§åˆ° 1.5 å€
+                    startItem->runAction(EaseBackOut::create(ScaleTo::create(0.3f, 1.5f)));
+                }
+            }
+            else {
+                if (isMouseOver) { // åªæœ‰â€œåˆšç¦»å¼€â€æ—¶æ‰æ‰§è¡Œ
+                    isMouseOver = false;
+                    // æ¢å¤å‘¼å¸åŠ¨ç”»
+                    runBreathAction();
+                }
+            }
+            };
+
+        _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
     }
 
-    // ´´½¨Ò»¸ö²Ëµ¥±äÁ¿£¨MenuItemImageÀàÐèÒª¹Ì¶¨ÔÚ²Ëµ¥ÉÏ£©
-    // ½«¿ªÊ¼°´Å¥Ìí¼Óµ½²Ëµ¥
     auto menu = Menu::create(startItem, NULL);
-
-    // ²Ëµ¥Î»ÖÃÉèÖÃÔÚÔ­µã
     menu->setPosition(Vec2::ZERO);
-
-    // ½«²Ëµ¥Ìí¼Óµ½³¡¾°
     this->addChild(menu, 1);
 
-    // ´´½¨Ò»¸ö¾«Áé£¨ÓÎÏ·¿ªÆÁÍ¼Æ¬£©
     auto sprite = Sprite::create("StartScene.jpeg");
-    if (sprite == nullptr) {
-        problemLoading("'StartScene.jpeg'");
-    }
-    else {
-        // ½«Í¼Æ¬ÖÃÓÚ³¡¾°ÖÐÑë
+    if (sprite) {
         sprite->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
-
-        // ÉèÖÃÍ¼Æ¬´óÐ¡£¬Ê¹ÆäÕ¼ÂúÕû¸ö»­Ãæ
         sprite->setScale(1.3);
-
-        // ½«Í¼Æ¬Ìí¼Óµ½³¡¾°
         this->addChild(sprite, 0);
     }
     return true;
 }
 
-// µã»÷°´Å¥ºó£¬´¥·¢´Ëº¯Êý£¬½«µ±Ç°³¡¾°¸ü»»ÎªÓÎÏ·³¡¾°
+// ç‚¹å‡»æŒ‰é’®åŽï¼Œè§¦å‘æ­¤å‡½æ•°ï¼Œå°†å½“å‰åœºæ™¯æ›´æ¢ä¸ºæ¸¸æˆåœºæ™¯
 void HelloWorld::menuCloseCallback(Ref* pSender) {
-    // ´´½¨Ò»¸öÓÎÏ·³¡¾°
+    // åˆ›å»ºä¸€ä¸ªæ¸¸æˆåœºæ™¯
     auto gamescene = Village::createScene();
 
-    // ¸ü»»³¡¾°
+    // æ›´æ¢åœºæ™¯
     Director::getInstance()->replaceScene(gamescene);
 }
