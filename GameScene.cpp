@@ -1,7 +1,6 @@
 ﻿#include "GameScene.h"
 #include "Soldier.h"
 #include "Building.h"
-#include "audio/include/SimpleAudioEngine.h"
 
 USING_NS_CC;
 
@@ -15,14 +14,6 @@ Scene* Game::createScene() {
 
 Scene* Level_1::createScene() {
     return Level_1::create();
-}
-
-Scene* Level_2::createScene() {
-    return Level_2::create();
-}
-
-Scene* Level_3::createScene() {
-    return Level_3::create();
 }
 
 // 初始化
@@ -61,8 +52,15 @@ bool Game::init() {
     _goblinLabel = Label::createWithTTF("Goblin: 0", "fonts/Marker Felt.ttf", 18);
     _goblinLabel->setPosition(Vec2(64, y - 112));
     this->addChild(_goblinLabel, 11);
+    // 在 Game::init() 靠近末尾的地方添加
+    _availableBarbarians = 10; // 强行给你10个野蛮人
+    _availableArchers = 10;
+    _availableGiants = 5;   
+    _availableGoblins = 5;
+    _isPlacingSoldier = false;  // 初始设为 false
+    _selectedSoldierType = SOLDIER_NONE;
 
-    updateTroopLabels();
+    updateTroopLabels(); // 更新一下左上角的数字显示
 
     // 启用逐帧更新
     this->scheduleUpdate();
@@ -112,25 +110,18 @@ void Game::update(float dt) {
 
     // 胜利判断逻辑
     if (_buildings.empty()) { // 场上建筑均被摧毁
-        this->unscheduleUpdate();
-
-        _eventDispatcher->removeEventListenersForTarget(this);
-
         auto victory = Sprite::create("Victory.png");
-        victory->setPosition(Vec2(352, 352));
+        victory->setPosition(Vec2(1000, 500));
         this->addChild(victory, 11);
 
         updateVillageTroopCounts();
 
         auto delay = DelayTime::create(1.0f);
+        this->runAction(delay);
         auto popScene = CallFunc::create([]() {
-            auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-            audio->stopBackgroundMusic();
-
             Director::getInstance()->popScene();
             });
         this->runAction(Sequence::create(delay, popScene, nullptr)); // 播放胜利CG
-        return;
     }
     
     // 失败判断逻辑
@@ -147,16 +138,13 @@ void Game::update(float dt) {
 
     if (!hasAliveSoldiers && !hasAvailableTroops) { // 场上兵种均阵亡，且可使用兵种已耗尽
         auto defeat = Sprite::create("Defeat.png");
-        defeat->setPosition(Vec2(352, 352));
+        defeat->setPosition(Vec2(1000, 500));
         this->addChild(defeat, 11);
 
         updateVillageTroopCounts();
 
         auto delay = DelayTime::create(1.0f);
         auto popScene = CallFunc::create([]() {
-            auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-            audio->stopBackgroundMusic();
-
             Director::getInstance()->popScene();
             });
         this->runAction(Sequence::create(delay, popScene, nullptr)); // 播放战败CG
@@ -178,6 +166,10 @@ void Game::updateTroopLabels() {
 // 初始化建筑
 // 第一关的建筑布局
 void Level_1::createInitialBuildings() {
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    float x = visibleSize.width;
+    float y = visibleSize.height;
+
     auto townHall = Building::createTownHall();
     townHall->setPosition(Vec2(1040, 592));
     this->addChild(townHall);
@@ -187,112 +179,6 @@ void Level_1::createInitialBuildings() {
     cannon->setPosition(Vec2(1120, 672));
     this->addChild(cannon);
     _buildings.push_back(cannon);
-}
-
-// 第二关的建筑布局
-void Level_2::createInitialBuildings() {
-    auto townHall = Building::createTownHall();
-    townHall->setPosition(Vec2(1040, 592));
-    this->addChild(townHall);
-    _buildings.push_back(townHall);
-
-    auto cannon1 = Building::createCannon();
-    cannon1->setPosition(Vec2(1120, 608));
-    this->addChild(cannon1);
-    _buildings.push_back(cannon1);
-    auto cannon2 = Building::createCannon();
-    cannon2->setPosition(Vec2(960, 576));
-    this->addChild(cannon2);
-    _buildings.push_back(cannon2);
-
-    auto goldMine = Building::createGoldMine();
-    goldMine->setPosition(Vec2(992, 672));
-    this->addChild(goldMine);
-    _buildings.push_back(goldMine);
-
-    auto elixirCollector = Building::createElixirCollector();
-    elixirCollector->setPosition(Vec2(1088, 512));
-    this->addChild(elixirCollector);
-    _buildings.push_back(elixirCollector);
-}
-
-// 第三关的建筑布局
-void Level_3::createInitialBuildings() {
-    auto townHall = Building::createTownHall();
-    townHall->setPosition(Vec2(1040, 592));
-    this->addChild(townHall);
-    _buildings.push_back(townHall);
-
-    auto cannon1 = Building::createCannon();
-    cannon1->setPosition(Vec2(1120, 576));
-    this->addChild(cannon1);
-    _buildings.push_back(cannon1);
-    auto cannon2 = Building::createCannon();
-    cannon2->setPosition(Vec2(960, 608));
-    this->addChild(cannon2);
-    _buildings.push_back(cannon2);
-    auto cannon3 = Building::createCannon();
-    cannon3->setPosition(Vec2(1056, 672));
-    this->addChild(cannon3);
-    _buildings.push_back(cannon3);
-    auto cannon4 = Building::createCannon();
-    cannon4->setPosition(Vec2(1024, 512));
-    this->addChild(cannon4);
-    _buildings.push_back(cannon4);
-
-    auto goldMine1 = Building::createGoldMine();
-    goldMine1->setPosition(Vec2(960, 544));
-    this->addChild(goldMine1);
-    _buildings.push_back(goldMine1);
-    auto goldMine2 = Building::createGoldMine();
-    goldMine2->setPosition(Vec2(1120, 640));
-    this->addChild(goldMine2);
-    _buildings.push_back(goldMine2);
-
-    auto goldStorage1 = Building::createGoldStorage();
-    goldStorage1->setPosition(Vec2(960, 480));
-    this->addChild(goldStorage1);
-    _buildings.push_back(goldStorage1);
-    auto goldStorage2 = Building::createGoldStorage();
-    goldStorage2->setPosition(Vec2(1120, 704));
-    this->addChild(goldStorage2);
-    _buildings.push_back(goldStorage2);
-
-    auto elixirCollector1 = Building::createElixirCollector();
-    elixirCollector1->setPosition(Vec2(992, 672));
-    this->addChild(elixirCollector1);
-    _buildings.push_back(elixirCollector1);
-    auto elixirCollector2 = Building::createElixirCollector();
-    elixirCollector2->setPosition(Vec2(1088, 512));
-    this->addChild(elixirCollector2);
-    _buildings.push_back(elixirCollector2);
-
-    auto elixirStorage1 = Building::createElixirStorage();
-    elixirStorage1->setPosition(Vec2(928, 672));
-    this->addChild(elixirStorage1);
-    _buildings.push_back(elixirStorage1);
-    auto elixirStorage2 = Building::createElixirStorage();
-    elixirStorage2->setPosition(Vec2(1152, 512));
-    this->addChild(elixirStorage2);
-    _buildings.push_back(elixirStorage2);
-
-    auto armyCamp1 = Building::createArmyCamp();
-    armyCamp1->setPosition(Vec2(1024, 736));
-    this->addChild(armyCamp1);
-    _buildings.push_back(armyCamp1);
-    auto armyCamp2 = Building::createArmyCamp();
-    armyCamp2->setPosition(Vec2(1056, 448));
-    this->addChild(armyCamp2);
-    _buildings.push_back(armyCamp2);
-
-    auto barracks1 = Building::createBarracks();
-    barracks1->setPosition(Vec2(880, 592));
-    this->addChild(barracks1);
-    _buildings.push_back(barracks1);
-    auto barracks2 = Building::createBarracks();
-    barracks2->setPosition(Vec2(1200, 592));
-    this->addChild(barracks2);
-    _buildings.push_back(barracks2);
 }
 
 // 创建兵种选择菜单
@@ -384,78 +270,64 @@ void Game::onTouchEnded(Touch* touch, Event* event) {
         return;
     }
 
-    Vec2 touchLocation = touch->getLocation(); // 获取点击位置坐标
+    Vec2 touchLocation = touch->getLocation();
 
-    // 点击位置不在菱形内，则点击无效
     if (!isPointInDiamond(touchLocation)) {
         return;
-    }
-
-    // 检查点击位置是否在建筑上
-    for (auto building : _buildings) {
-        if (building && building->isAlive() && !building->isDestroyed()) {
-            // 检查触摸点是否在建筑范围内
-            if (fabs(touchLocation.x - building->getPosition().x) <= building->getSize() && fabs(touchLocation.y - building->getPosition().y) <= building->getSize()) {
-                // 点击位置在建筑上，禁止下兵
-                return;
-            }
-        }
     }
 
     Soldier* newSoldier = nullptr;
     bool canPlace = false;
 
-    // 确定选择的是哪种兵种
     switch (_selectedSoldierType) {
-    case SOLDIER_BARBARIAN:
-        if (_availableBarbarians > 0) {
-            newSoldier = Soldier::createBarbarian();
-            canPlace = true;
-            _availableBarbarians--;
-            updateVillageTroopCounts();
-        }
-        break;
-
-    case SOLDIER_ARCHER:
-        if (_availableArchers > 0) {
-            newSoldier = Soldier::createArcher();
-            canPlace = true;
-            _availableArchers--;
-            updateVillageTroopCounts();
-        }
-        break;
-
-    case SOLDIER_GIANT:
-        if (_availableGiants > 0) {
-            newSoldier = Soldier::createGiant();
-            canPlace = true;
-            _availableGiants--;
-            updateVillageTroopCounts();
-        }
-        break;
-
-    case SOLDIER_GOBLIN:
-        if (_availableGoblins > 0) {
-            newSoldier = Soldier::createGoblin();
-            canPlace = true;
-            _availableGoblins--;
-            updateVillageTroopCounts();
-        }
-        break;
-
-    default:
-        return;
+        case SOLDIER_BARBARIAN:
+            if (_availableBarbarians > 0) {
+                newSoldier = Soldier::createBarbarian();
+                canPlace = true;
+                if (newSoldier) _availableBarbarians--; // 只有创建成功才减数量
+            }
+            break;
+        case SOLDIER_ARCHER:
+            if (_availableArchers > 0) {
+                newSoldier = Soldier::createArcher();
+                canPlace = true;
+                if (newSoldier) _availableArchers--;
+            }
+            break;
+        case SOLDIER_GIANT:
+            if (_availableGiants > 0) {
+                newSoldier = Soldier::createGiant(); // 如果这里返回空，下面会拦截
+                canPlace = true;
+                if (newSoldier) _availableGiants--;
+            }
+            break;
+        case SOLDIER_GOBLIN:
+            if (_availableGoblins > 0) {
+                newSoldier = Soldier::createGoblin();
+                canPlace = true;
+                if (newSoldier) _availableGoblins--;
+            }
+            break;
+        default:
+            return;
     }
 
-    if (newSoldier && canPlace) {
-        newSoldier->setPosition(touchLocation); // 在点击位置放置兵种
-
-        newSoldier->setBuildings(_buildings); // 把场上的建筑集合传递给这个兵，让它选择攻击目标
+    // ✨ 修改重点：必须同时满足 newSoldier 不为空且可以放置
+    if (newSoldier != nullptr && canPlace) {
+        newSoldier->setPosition(touchLocation);
+        newSoldier->setBuildings(_buildings);
 
         this->addChild(newSoldier);
+
+        // 只有在这里确保 newSoldier != nullptr，push_back 才不会触发 CCASSERT 崩溃
         _soldiers.push_back(newSoldier);
 
-        updateTroopLabels(); // 更新
+        updateTroopLabels();
+        updateVillageTroopCounts(); // 统一在放置成功后更新
+    }
+    else if (canPlace) {
+        // 调试用：如果数量够但没创建出来，说明资源或 create 函数有问题
+        CCLOG("Error: Failed to create soldier instance for type: %d", _selectedSoldierType);
     }
 }
 
@@ -561,15 +433,92 @@ void Game::onGoblinClicked(Ref* sender) {
     }
 }
 
-void Game::onEnter() {
-    Scene::onEnter();
+// --- Level_2 实现 ---
+Scene* Level_2::createScene() {
+    return Level_2::create();
+}
 
-    // 确保主场景音乐在进入场景时播放
-    auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+void Level_2::createInitialBuildings() {
+    // 1. 核心大本营（两个）
+    auto th1 = Building::createTownHall();
+    th1->setPosition(Vec2(1024, 600)); // 中心
+    this->addChild(th1);
+    _buildings.push_back(th1);
 
-    // 如果背景音乐没有在播放，则开始播放
-    if (!audio->isBackgroundMusicPlaying()) {
-        audio->preloadBackgroundMusic("Home Village Combat Music.mp3");
-        audio->playBackgroundMusic("Home Village Combat Music.mp3", true);
+    auto th2 = Building::createTownHall();
+    th2->setPosition(Vec2(1150, 500)); // 侧翼
+    this->addChild(th2);
+    _buildings.push_back(th2);
+
+    // 2. 防御塔阵列（四个加农炮，形成交叉火力）
+    Vec2 cannonPos[] = {
+        Vec2(900, 700),  // 左上
+        Vec2(1200, 700), // 右上
+        Vec2(900, 400),  // 左下
+        Vec2(1200, 400)  // 右下
+    };
+
+    for (int i = 0; i < 4; i++) {
+        auto cn = Building::createCannon();
+        cn->setPosition(cannonPos[i]);
+        this->addChild(cn);
+        _buildings.push_back(cn);
+    }
+
+    // 3. 增加一些“资源罐”作为干扰建筑，消耗士兵火力
+    for (int i = 0; i < 3; i++) {
+        auto storage = Building::createTownHall(); // 暂时用大本营逻辑代替，或者你有Storage类
+        storage->setScale(0.6f); // 缩小一点作为装饰性目标
+        storage->setPosition(Vec2(800 + i * 200, 300));
+        this->addChild(storage);
+        _buildings.push_back(storage);
     }
 }
+
+// --- Level_3 实现 ---
+Scene* Level_3::createScene() {
+    return Level_3::create();
+}
+
+void Level_3::createInitialBuildings() {
+    auto center = Vec2(1024, 550); // 地图大致中心
+
+    // 1. 核心大本营群（3个，形成品字形）
+    Vec2 thPositions[] = { center, center + Vec2(100, -80), center + Vec2(-100, -80) };
+    for (auto pos : thPositions) {
+        auto th = Building::createTownHall();
+        th->setPosition(pos);
+        this->addChild(th);
+        _buildings.push_back(th);
+    }
+
+    // 2. 防御塔林（6个加农炮，环绕护卫）
+    for (int i = 0; i < 6; i++) {
+        // 使用简单的三角函数让炮台绕中心排布
+        float angle = i * (M_PI * 2 / 6);
+        float radius = 250.0f;
+        Vec2 cannonPos = center + Vec2(cos(angle) * radius, sin(angle) * radius);
+
+        auto cn = Building::createCannon();
+        cn->setPosition(cannonPos);
+        // 提高第三关难度：让第三关的炮台缩放稍微大一点，看起来更有威慑力
+        cn->setScale(1.2f);
+        this->addChild(cn);
+        _buildings.push_back(cn);
+    }
+
+    // 3. 外围障碍物/资源罐（8个，作为第一层防线消耗士兵数量）
+    for (int i = 0; i < 8; i++) {
+        float angle = i * (M_PI * 2 / 8);
+        float radius = 450.0f; // 最外圈
+        Vec2 storagePos = center + Vec2(cos(angle) * radius, sin(angle) * radius);
+
+        auto storage = Building::createTownHall(); // 暂代资源罐
+        storage->setScale(0.5f);
+        storage->setPosition(storagePos);
+        storage->setOpacity(180); // 稍微透明一点，区分于主基地
+        this->addChild(storage);
+        _buildings.push_back(storage);
+    }
+}
+

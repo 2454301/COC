@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>Elixir Collector.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,-0.5}</string>
+                <key>spriteSize</key>
+                <string>{64,65}</string>
+                <key>spriteSourceSize</key>
+                <string>{64,64}</string>
+                <key>textureRect</key>
+                <string>{{0,0},{64,65}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>3</integer>
+            <key>pixelFormat</key>
+            <string>RGBA8888</string>
+            <key>premultiplyAlpha</key>
+            <false/>
+            <key>realTextureFileName</key>
+            <string>COCElixir Collector.png</string>
+            <key>size</key>
+            <string>{64,65}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:4070a9ec8d48b050cf0a56984c3de4db:672f4d7e9bd733f0ec9121b207872137:54a9ce320d1fa542b6b8d4be700426ed$</string>
+            <key>textureFileName</key>
+            <string>COCElixir Collector.png</string>
+        </dict>
+    </dict>
+</plist>

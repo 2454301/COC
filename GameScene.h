@@ -15,7 +15,7 @@ public:
 
     // 初始化界面
     virtual bool init();
-
+    
     // 枚举类，便于选择
     enum SoldierType {
         SOLDIER_NONE,
@@ -50,8 +50,6 @@ public:
             _village->updateTroopLabels();
         }
     }
-
-    virtual void onEnter() override;
 
 protected:
     // 触摸开始和结束检测函数
@@ -106,7 +104,7 @@ protected:
     Village* _village = nullptr;
 };
 
-// 继承自Game类的关卡
+// 继承自Game类的关卡，后续可添加2、3关
 class Level_1 : public Game {
 public:
     static cocos2d::Scene* createScene();
@@ -116,22 +114,22 @@ protected:
     void createInitialBuildings() override; // 重写初始建筑布局
 };
 
+// 第二关：建筑更多，防御更强
 class Level_2 : public Game {
 public:
     static cocos2d::Scene* createScene();
     CREATE_FUNC(Level_2);
 
 protected:
-    void createInitialBuildings() override; // 重写初始建筑布局
+    virtual void createInitialBuildings() override;
 };
-
+// 第三关：终极挑战，高密度防御阵型
 class Level_3 : public Game {
 public:
     static cocos2d::Scene* createScene();
     CREATE_FUNC(Level_3);
 
 protected:
-    void createInitialBuildings() override; // 重写初始建筑布局
+    virtual void createInitialBuildings() override;
 };
-
 #endif // __GAME_SCENE_H__

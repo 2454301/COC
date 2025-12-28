@@ -365,31 +365,20 @@ bool DraggableBuildings::init(const std::string& filename)
 	this->setDraggable(true);
 
 	initInfoPanel();
-	_healthBar = ui::LoadingBar::create(
-		"Healthchar.png"
-	);
+	_healthBar = ui::LoadingBar::create("Healthchar.png");
 	_healthBar->setDirection(ui::LoadingBar::Direction::LEFT);
-	_healthBar->setPercent(
-		100); // 初始满血
+	_healthBar->setPercent(100); // 初始满血
 
 	// 设置位置：位于建筑图片的顶部中心，再往上偏移 10 像素
-	Size size =
-		this
-		->getContentSize();
-	_healthBar->setPosition(Vec2(size.width /
-		2, size.height + 10
-	));
+	Size size =this->getContentSize();
+	_healthBar->setPosition(Vec2(size.width / 2, size.height + 10));
 
 	// 如果图片太长，可以手动设置尺寸
-	_healthBar->ignoreContentAdaptWithSize(
-		false
-	);
-	_healthBar->setContentSize(Size(
-		60, 10)); // 宽度60，高度10，你可以根据资源微调
+	_healthBar->ignoreContentAdaptWithSize(false);
+	_healthBar->setContentSize(Size(60, 10)); // 宽度60，高度10，你可以根据资源微调
 
 	this->addChild(_healthBar, 101); // 确保在最上层
-	_healthBar->setVisible(
-		true);    // 保持一直可见
+	_healthBar->setVisible(true);    // 保持一直可见
 	return true;
 }
 
@@ -595,25 +584,19 @@ void DraggableBuildings::upgrade() {
 			// 这是让计时器跑起来的关键指令
 			this->scheduleUpdate();
 			// --- 震动特效启动 ---
-
 			_sakikoSprite = Sprite::create("Sakiko.png");
 			if
 				(_sakikoSprite) {
 				// 设置在建筑上方一点的位置
 				_sakikoSprite->setPosition(Vec2(
-					this->getContentSize().width / 2, this->getContentSize().height + 40
-				));
+					this->getContentSize().width / 2, this->getContentSize().height + 40));
 				_sakikoSprite->setScale(
 					0.5f); // 根据你的图片大小调整缩放
 				this->addChild(_sakikoSprite, 15); // 加在建筑上，它会跟着建筑一起抖动
 
 				// 给 Sakiko 加一个简单的淡入效果
-				_sakikoSprite->setOpacity(
-					0
-				);
-				_sakikoSprite->runAction(FadeIn::create(
-					0.3f
-				));
+				_sakikoSprite->setOpacity(0);
+				_sakikoSprite->runAction(FadeIn::create(0.3f));
 			}
 			auto moveLeft = MoveBy::create(0.05f, Vec2(-2, 0));
 			auto moveRight = MoveBy::create(0.05f, Vec2(2, 0));
@@ -871,7 +854,7 @@ void DraggableBuildings::onCollectClicked(cocos2d::Ref* sender) {
 
 	_currentInternalResource = 0.0f; // 清空内部存储
 
-	// ✨ 进度条归零并隐藏
+	// 进度条归零并隐藏
 	if (_productionBar) _productionBar->setPercent(0);
 	if (_productionNode) _productionNode->setVisible(false);
 
@@ -1042,30 +1025,6 @@ void Village::levelCallBack_1(Ref* psender) {
 	}
 }
 
-void Village::levelCallBack_2(Ref* psender) {
-	auto item = dynamic_cast<MenuItemImage*>(psender);
-	if (item) {
-		// --- 新增：调用 Ciallo 特效 ---
-		playCialloEffect(item->getPosition());
-
-		auto moveLeft = MoveBy::create(0.05f, Vec2(-5, 0));
-		auto moveRight = MoveBy::create(0.05f, Vec2(10, 0));
-		auto moveBack = MoveBy::create(0.05f, Vec2(-5, 0));
-
-		item->runAction(Sequence::create(moveLeft, moveRight, moveBack, nullptr));
-		CCLOG("Level 2 is coming soon!");
-	}
-}
-
-void Village::levelCallBack_3(Ref* psender) {
-	auto item = dynamic_cast<MenuItemImage*>(psender);
-	if (item) {
-		// --- 新增：调用 Ciallo 特效 ---
-		playCialloEffect(item->getPosition());
-
-		item->runAction(Sequence::create(MoveBy::create(0.05f, Vec2(-5, 0)), MoveBy::create(0.1f, Vec2(10, 0)), MoveBy::create(0.05f, Vec2(-5, 0)), nullptr));
-	}
-}
 void DraggableBuildings::showFullTip(const std::string& msg) {
 	auto label = Label::createWithTTF(msg, "fonts/Marker Felt.ttf", 24);
 	if (!label) return;
@@ -1079,4 +1038,44 @@ void DraggableBuildings::showFullTip(const std::string& msg) {
 	auto fade = FadeOut::create(1.0f);
 	auto spawn = Spawn::create(move, fade, nullptr);
 	label->runAction(Sequence::create(spawn, RemoveSelf::create(), nullptr));
+}
+
+void Village::levelCallBack_2(Ref* psender) {
+	auto item = dynamic_cast<MenuItemImage*>(psender);
+	if (item) {
+		playCialloEffect(item->getPosition());
+
+		// 如果没有兵，不让进
+		if (_numOfBarbarians == 0 && _numOfArchers == 0 && _numOfGiants == 0 && _numOfGoblins == 0) {
+			return;
+		}
+
+		auto level2Scene = Level_2::createScene();
+		auto level = dynamic_cast<Level_2*>(level2Scene);
+		if (level) {
+			// 传递兵力数据
+			level->setTroopCounts(_numOfBarbarians, _numOfArchers, _numOfGiants, _numOfGoblins);
+			level->setVillage(this);
+		}
+		Director::getInstance()->pushScene(level2Scene);
+	}
+}
+
+void Village::levelCallBack_3(Ref* psender) {
+	auto item = dynamic_cast<MenuItemImage*>(psender);
+	if (item) {
+		playCialloEffect(item->getPosition());
+
+		if (_numOfBarbarians == 0 && _numOfArchers == 0 && _numOfGiants == 0 && _numOfGoblins == 0) {
+			return;
+		}
+
+		auto level3Scene = Level_3::createScene();
+		auto level = dynamic_cast<Level_3*>(level3Scene);
+		if (level) {
+			level->setTroopCounts(_numOfBarbarians, _numOfArchers, _numOfGiants, _numOfGoblins);
+			level->setVillage(this);
+		}
+		Director::getInstance()->pushScene(level3Scene);
+	}
 }

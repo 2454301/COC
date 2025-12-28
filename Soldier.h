@@ -54,7 +54,7 @@ private:
 	bool _isMoving = false;
 	// 判断是否攻击
 	bool _isAttacking = false;
-	// 攻击目标
+	// 攻击目标（这里用的类是GameObject，可能出现兵种互相攻击的情况，以后修复）
 	GameObject* _target = nullptr;
 	// 优先攻击的建筑种类
 	BuildingType _priority = BUILDING_NORMAL;

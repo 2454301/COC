@@ -15,7 +15,7 @@ bool Soldier::initBarbarian() {
 	if (!GameObject::init()) {
 		return false;
 	}
-
+	
 	// 传入动作相关文件
 	cocos2d::SpriteFrameCache::getInstance()->addSpriteFramesWithFile("COCBarbarianrun.plist");
 	cocos2d::SpriteFrameCache::getInstance()->addSpriteFramesWithFile("COCBarbarianattack.plist");
@@ -243,12 +243,7 @@ GameObject* Soldier::findNearestBuilding() {
 		}
 	}
 
-	if (_priority == BUILDING_NORMAL) {
-		return minDistance_1 < minDistance_2 ? nearest_1 : nearest_2;
-	}
-	else {
-		return nearest_1 != nullptr ? nearest_1 : nearest_2;
-	}
+	return nearest_1 != nullptr ? nearest_1 : nearest_2;
 }
 
 // 设置自己的攻击目标
@@ -322,7 +317,6 @@ void Soldier::updateBehavior(float dt) {
 			cocos2d::Vec2 currentPos = this->getPosition();
 			cocos2d::Vec2 targetPos = _target->getPosition();
 			cocos2d::Vec2 direction = targetPos - currentPos;
-			cocos2d::Vec2 anotherDirection = cocos2d::Vec2::ZERO;
 
 			direction.normalize(); // 标准化
 
@@ -335,10 +329,8 @@ void Soldier::updateBehavior(float dt) {
 			for (auto building : _availableBuildings) {
 				if (building && building->isAlive() && building != _target) {
 					float dist = newPos.distance(building->getPosition());
-					float minDistance = building->getSize() / 2.2; // 最小安全距离
+					float minDistance = building->getSize() / 2; // 最小安全距离
 					if (dist < minDistance) {
-						cocos2d::Vec2 anotherTargetPos = building->getPosition();
-						anotherDirection = anotherTargetPos - currentPos;
 						willCollide = true;
 						break;
 					}
@@ -348,18 +340,11 @@ void Soldier::updateBehavior(float dt) {
 			if (!willCollide) {
 				this->setPosition(newPos);
 			}
-			else { // 视不同情况，选择最合适的绕行方向（利用叉积）
-				float cross = direction.x * anotherDirection.y - direction.y * anotherDirection.x;
-				if (cross > 0) {
-					auto t = direction.x = -direction.x;
-					direction.x = direction.y;
-					direction.y = t;
-				}
-				else {
-					auto t = direction.y = -direction.y;
-					direction.y = direction.x;
-					direction.x = t;
-				}
+			else {
+				// 将方向顺时针转90度
+				auto t = direction.x = -direction.x;
+				direction.x = direction.y;
+				direction.y = t;
 
 				newPos = currentPos + direction * moveDistance;
 				this->setPosition(newPos);

@@ -2,79 +2,72 @@
 #define __BUILDING_H__
 
 #include "GameObject.h"
+#include <vector>
 
 class Soldier;
 
 class Building : public GameObject {
 public:
-	// 建筑的创建
-	static Building* createTownHall();
-	static Building* createCannon();
-	static Building* createGoldMine();
-	static Building* createElixirCollector();
-	static Building* createArmyCamp(); // 训练营
-	static Building* createBarracks(); // 兵营
-	static Building* createGoldStorage();
-	static Building* createElixirStorage();
+    // 静态创建方法
+    static Building* createTownHall();
+    static Building* createCannon();
+    static Building* createGoldMine();
+    static Building* createElixirCollector();
+    static Building* createArmyCamp();
+    static Building* createBarracks();
 
-	// 设置攻击目标
-	void attack(GameObject* target);
-	// 停止
-	void stop();
+    // 设置攻击目标
+    void attack(GameObject* target);
+    void stop();
 
-	int getSize() {
-		return _size;
-	}
-	BuildingType getType() {
-		return _type;
-	}
+    // Getter 方法
+    int getSize() { return _size; }
+    BuildingType getType() { return _type; }
 
-	// 传入兵种集合
-	void setSoldiers(const std::vector<Soldier*>& soldiers) {
-		_availableSoldiers = soldiers;
-	}
+    // 传入兵种集合
+    void setSoldiers(const std::vector<Soldier*>& soldiers) {
+        _availableSoldiers = soldiers;
+    }
 
-	// 寻找第一个进入范围的兵种
-	GameObject* findFirstSoldier();
+    // 寻找第一个进入范围的兵种
+    GameObject* findFirstSoldier();
 
-	// 行为更新系统
-	void updateBehavior(float dt) override;
-	// 受攻击和被摧毁
-	void onHit(float damage) override;
-	void onDestroy() override;
+    // 行为逻辑重写
+    void updateBehavior(float dt) override;
+    void onHit(float damage) override;
+    void onDestroy() override;
 
 private:
-	// 初始化
-	bool initTownHall();
-	bool initCannon();
-	bool initGoldMine();
-	bool initElixirCollector();
-	bool initArmyCamp();
-	bool initBarracks();
-	bool initGoldStorage();
-	bool initElixirStorage();
+    // 初始化私有方法
+    bool initTownHall();
+    bool initCannon();
+    bool initGoldMine();
+    bool initElixirCollector();
+    bool initArmyCamp();
+    bool initBarracks();
 
+    // --- 血条相关实现（新增加的方法） ---
+    void setupHealthBar();  // 初始化血条
+    void updateHealthBar(); // 更新血条
 
-	// 等级
-	int _level = 1;
-	// 尺寸
-	int _size = 0;
-	// 攻击力
-	float _attack = 0.0f;
-	// 攻击范围
-	float _range = 0.0f;
-	// 建筑种类
-	BuildingType _type = BUILDING_NORMAL;
+    // --- 血条组件变量 ---
+    cocos2d::ProgressTimer* _healthBar = nullptr;
+    cocos2d::Sprite* _healthBarBg = nullptr;
 
-	// 判断是否在攻击
-	bool _isAttacking = false;
-	// 攻击目标
-	GameObject* _target = nullptr;
-	// 攻击时间间隔
-	float _attackTimer = 0.0f;
+    // --- 建筑属性 ---
+    int _level = 1;
+    int _size = 0;
+    float _attack = 0.0f;
+    float _range = 0.0f;
+    BuildingType _type = BUILDING_NORMAL;
 
-	// 传入的合法兵种集合
-	std::vector<Soldier*> _availableSoldiers;
+    // --- 战斗状态 ---
+    bool _isAttacking = false;
+    GameObject* _target = nullptr;
+    float _attackTimer = 0.0f;
+
+    // 兵种集合
+    std::vector<Soldier*> _availableSoldiers;
 };
 
 #endif // __BUILDING_H__
